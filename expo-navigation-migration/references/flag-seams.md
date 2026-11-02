@@ -22,7 +22,7 @@ First ask whether the recommendation changes who owns navigation.
 | Seam | Fits | Flag chooses | Evidence |
 | --- | --- | --- | --- |
 | **Screen** | A routed screen whose body changes to or from @expo/ui | Body of one screen: React Native or @expo/ui. Chooses nothing in an app with no React Native bodies. | Verified in the prototype ([mixed-content](patterns/mixed-content.md)) |
-| **Route** | R, or U with Router as its host | Which route or layout renders: a Router screen, or an @expo/ui shell mounted as one route | Verified as a user-triggered switch ([shell-coexistence](patterns/shell-coexistence.md)). A flag driving it was not run, so it has a spike. |
+| **Route** | R, or U with Router as its host | Which route or layout renders: a Router screen, or an @expo/ui shell mounted as one route | The @expo/ui shell route was verified as a user-triggered switch ([shell-coexistence](patterns/shell-coexistence.md)). A layout choosing a navigator, or a screen choosing its implementation, was not run. A flag driving either form was not run, so both have a spike. |
 | **Navigator** | N staying on plain React Navigation | Which navigator a stack uses, for example JS stack or native stack | Standard API. Not in the prototype. No official option-by-option mapping exists, so audit each header option. |
 | **Hosted tree** | N, when entry seam spike fails | Router is the root. A legacy tree runs as an isolated embedded tree under one route. | Narrow official carve-out, written for embedded trees. Not run here. |
 | **Entry** | N, W, X moving to Router | Which root registers at launch | **Not documented, not run.** Needs the spike below. |
@@ -56,7 +56,7 @@ The prototype switched shells from a button on a root `Stack`. Prove the flagged
 1. A flag read at launch shows the chosen shell as the first screen, with no flash of the other.
 2. A second launch with the flag changed takes the other shell.
 3. If the root layout is a `<Slot />`, the choice works there too. Otherwise add the root `Stack` first, as its own shipped step.
-4. Back at the shell's root does what the app needs: on Android, leaves the app rather than revealing the other shell.
+4. For the @expo/ui shell route, back at the shell's root does what the app needs: on Android, leaves the app rather than revealing the other shell.
 5. Each row of the URL table reaches a usable screen under both values.
 6. Typecheck, lint and the baseline flows pass under both values.
 
