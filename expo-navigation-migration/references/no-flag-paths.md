@@ -9,7 +9,7 @@ A flag is not possible when:
 - two navigation stacks in one binary break a size, compliance or staffing limit
 - the old library cannot share a binary with the target
 - the app has no way to deliver a remote value or to measure a ramp, and the team will not add one
-- nothing is switching: the plan is an SDK hop only
+- nothing is switching: the plan is an SDK hop only, or an adopt-in-place change that can ship on a release branch
 - the owner rejects it
 
 Name the reason for this repository.
@@ -56,9 +56,9 @@ For apps with separate areas. Replace a whole area with its own navigator in eac
 
 For apps being redesigned anyway. Accept that old and new versions differ in the field for as long as users update slowly. Keep old URLs working through `+native-intent`, `redirects` or `Redirect` stub routes.
 
-### E. SDK hop on a release branch
+### E. Owner stays, on a release branch
 
-For the hop-only outcome: the owner of navigation stays, and one binary per SDK ships. Branch, upgrade, fix what breaks, run the baseline, then release through the internal track and a staged rollout. Before the switch, write down what the hop puts at risk in this app: local modules, patches, private imports, custom entries, scene handling. Each gets a check. The clean exit removes only the hop's scaffolding, such as patches that the new SDK makes unnecessary.
+For the hop-only and adopt-in-place outcomes: the owner of navigation stays. Branch, then upgrade, with one binary per SDK, or make the in-place change. Fix what breaks, run the baseline, prepare the rollback build, then release through the internal track and a staged rollout. Before the switch, write down what the change puts at risk in this app: local modules, patches, private imports, custom entries, scene handling. Each gets a check. The clean exit removes only what the plan replaced, such as patches that the new SDK makes unnecessary.
 
 ## Any path
 
@@ -66,4 +66,4 @@ For the hop-only outcome: the owner of navigation stays, and one binary per SDK 
 - Freeze navigation changes for the cut window. Short-lived branches only.
 - Publish no OTA that assumes the new native code to binaries with the old runtime version. Use the `fingerprint` runtime version policy, or bump by hand.
 - Set abort conditions before the rollout starts: crash-free rate, deep link failure rate, and any flow that fails E2E.
-- Run the clean exit in the same plan. There is no flag to remove, but legacy packages, `linking` config and the facade's old adapter remain.
+- Run the clean exit in the same plan. There is no flag to remove, but its removal list still applies.

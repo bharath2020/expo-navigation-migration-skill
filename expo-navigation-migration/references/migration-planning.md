@@ -63,24 +63,24 @@ Steps 0 to 3 pay off even if the migration stops there.
 | 11 | **Internal ramp** | Staff, then beta. Fix findings. Exit: all parity rows closed, baseline green on the new shell. | Never |
 | 12 | **Staged ramp** | Percentages agreed with the owner. Abort conditions written beforehand: crash-free rate, deep link failures, a failing flow. Abort means flag off, then diagnose. With no flag, this is the store's staged rollout, and abort means halting it and shipping the rollback build. | Never |
 | 13 | **Bake** | Hold at 100% with the kill switch live for at least one release cycle. Exit: old-shell traffic is negligible, and the oldest supported binary contains the new shell. With no flag or no telemetry, hold for one release cycle and state what stands in for the measure. | Hop only |
-| 14 | **Clean exit** | Below. | Never. When the owner stays, only its own rows below apply. |
+| 14 | **Clean exit** | Below. | Never. The plan's removal list sets its size. |
 
 ### Clean exit
 
 Ships as a new binary when native dependencies change, and otherwise as whatever the change needs. Do it in one change that can be reviewed, and do not bundle unrelated work.
 
 - With a flag, delete the flag, its read, its store key, its telemetry label and its dashboards.
-- When the owner changes, delete the old navigators, screens' old adapters and the old `linking` config. When it stays, delete only what the plan replaced.
-- Remove what the old navigation needed:
+- Name the removal list: the specific old packages, imports, components, files and config this plan removes. Start from this table:
 
-  | Old navigation | Remove |
+  | Plan | Usually on the list |
   | --- | --- |
-  | React Navigation being replaced, Wix or `react-router-native` | `@react-navigation/*`, `react-native-navigation` or `react-router-native`, and any patches for them |
-  | Router being replaced | The replaced routes and layouts. `expo-router` and any patches for it, unless Router stays as the host of an @expo/ui shell. |
-  | @expo/ui shell being replaced | Shell components and the local modules only they use. `@expo/ui` itself stays for leaves. |
-  | Adopt in place, replacing a navigator | The replaced navigator's package, such as `@react-navigation/stack`. Other packages stay. |
-  | Adopt in place, other changes | The old screen bodies or chrome it replaced. Packages stay. |
+  | Replaces React Navigation, Wix or `react-router-native` | Old navigators, screens' old adapters and the old `linking` config. `@react-navigation/*`, `react-native-navigation` or `react-router-native`, and any patches for them. |
+  | Replaces Router | The replaced routes and layouts. If Router goes entirely, `expo-router` and any patches for it. |
+  | Replaces an @expo/ui shell | Shell components and the local modules only they use |
+  | Owner stays | Only what the plan replaced: a navigator and any package of its own, or old screen bodies or chrome |
   | Hop only | Scaffolding: patches and workarounds the new SDK makes unnecessary |
+
+  What the target keeps is never on the list, such as `Stack.Protected` for auth, @expo/ui leaves, and Router as the host of a shell.
 
 - When moving to Router, set `main` to `expo-router/entry`, or keep a side-effects-only entry that imports it last. If analysis found an entry that branches per window or scene, keep that branch, and record that it is outside the documented contract and must be re-tested each SDK. When dropping Router, point `main` at the new root.
 - Collapse the facade if it now only forwards to the router. Keep it if it holds real logic.
@@ -90,20 +90,8 @@ Ships as a new binary when native dependencies change, and otherwise as whatever
 
 Done when:
 
-- `node <skill>/scripts/inventory-navigation.mjs <repo>` shows the old navigation's signals pass. With a flag, add `--flag '<flag name>'`, and `signals.flagName.count` must be 0. Without a flag, that clause does not apply.
-
-  | Old navigation | Signals |
-  | --- | --- |
-  | React Navigation being replaced | `react-navigation:import`, `:container`, `:native-stack`, `:js-stack`, `:bottom-tabs`, `:top-tabs` and `:drawer` are absent. When moving to Router, a `create*Navigator` hit may stay if it imports from `expo-router/*`. |
-  | Router being replaced | `expo-router:native-tabs`, `:stack-toolbar` and `:protected` are absent. When dropping Router, `expo-router:import` and `:private-import` are absent too. |
-  | Wix | `wix-navigation` is absent |
-  | `react-router-native` | `react-router-native` is absent |
-  | @expo/ui shell being replaced | `expo-ui:nav-containers` and `native:swiftui-navigation` are absent, or remain only in a named self-contained flow |
-  | Adopt in place, replacing a navigator | Only the replaced navigator's signal is absent, for example `react-navigation:js-stack` |
-  | Adopt in place, other changes, or hop only | No signal check: navigation keeps its owner |
-
-  Leave `react-navigation:hooks`, `:imperative` and `:set-options` out of this check. They also match Router's own `useNavigation`, `useFocusEffect` and `navigation.setOptions`.
-- packages in the `Remove` column for this plan are gone from the lockfile
+- everything on the removal list is gone. With a flag, `node <skill>/scripts/inventory-navigation.mjs <repo> --flag '<flag name>'` reports `signals.flagName.count` as 0. Check packages in the lockfile, and imports, components and files with targeted searches.
+- every remaining inventory hit on old navigation is confirmed or dismissed by reading its code. Signals are text matches, so a hit fails this check only when it is something on the removal list still in use.
 - `npx expo-doctor`, typecheck, lint and the full E2E baseline pass
 - the URL table passes
 
@@ -116,5 +104,5 @@ Done when:
 - [ ] Nothing a flag cannot cover is claimed to be behind one.
 - [ ] Each undocumented or unrun approach is labelled and has a spike with pass conditions.
 - [ ] Each parity row has a status from the catalog, or `not exercised (no catalog entry)`, and no status is upgraded.
-- [ ] The final step removes any flag and the old navigation, or when the owner stays what the plan replaced, with a checkable finish.
+- [ ] The final step names any flag and the old packages, imports, components and files it removes, with a checkable finish.
 - [ ] Open questions are listed, with who can answer each.

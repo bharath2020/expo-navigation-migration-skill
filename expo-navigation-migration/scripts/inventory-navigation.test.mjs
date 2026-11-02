@@ -285,7 +285,7 @@ test('--flag finds the flag in E2E, CI, env and native config files', () => {
   assert.deepEqual([...flagName.locations].sort(), files.map((path) => `${path}:1`).sort());
 });
 
-test('a Router-only app hits no signal the clean exit treats as the old library', () => {
+test('a Router-only app hits no old-library or @expo/ui container signal', () => {
   const dir = fixture({
     'app/_layout.tsx': "import { Stack, useNavigation, useFocusEffect } from 'expo-router';\n",
     'app/index.tsx': [

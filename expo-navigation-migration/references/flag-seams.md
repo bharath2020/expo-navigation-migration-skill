@@ -15,7 +15,8 @@ First ask whether the recommendation changes who owns navigation.
 
 - **No, and only the SDK moves:** no seam applies. Record that, and use [no-flag path E](no-flag-paths.md).
 - **No, but screens change:** use the Screen seam, where a routed screen has a React Native body to replace.
-- **No, but a navigator is replaced:** use the Navigator seam.
+- **No, but a Router app swaps a layout navigator:** use the first form of the [Route seam](#route-seam).
+- **No, but an N app on plain React Navigation swaps a navigator:** use the [Navigator seam](#navigator-seam).
 - **Yes:** take the first row below that fits, from Route down. Add Screen seams on top if the plan adds @expo/ui leaves.
 
 | Seam | Fits | Flag chooses | Evidence |

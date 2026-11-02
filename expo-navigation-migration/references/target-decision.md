@@ -58,7 +58,7 @@ Name one. It sets the shape of the plan.
 | Outcome | Means | Plan |
 | --- | --- | --- |
 | **Switch** | The owner of navigation changes: to Router, or between shells | Flag and no-flag paths both apply. Full ladder. |
-| **Adopt in place** | The owner stays, and the app takes up new APIs or @expo/ui leaves, or replaces a navigator | Screen, Route or Navigator seam. Most of the ladder falls away. |
+| **Adopt in place** | The owner stays, and the app takes up new APIs or @expo/ui leaves, or replaces a navigator | Screen, Route or Navigator seam. Without a flag, [no-flag path E](no-flag-paths.md). Most of the ladder falls away. |
 | **Hop only** | The owner stays, and only the SDK moves | Nothing to flag: section (a) records that. Section (b) is the plan, using [no-flag path E](no-flag-paths.md). |
 
 ## Writing the recommendation

@@ -41,7 +41,7 @@ What would change this recommendation:
 
 **Role here:** <The fallback, with reasons specific to this repository; or the plan, because of section (a)>
 
-**Path:** <A / B / C / D / E, with why>
+**Path:** <A / B / C / D, or E when the owner stays, with why>
 
 | Flag gives | Here, without one |
 | --- | --- |
@@ -69,12 +69,12 @@ Steps that depend on an open question sit in a conditional track, named after th
 
 ### Final step: clean exit
 
-- **Change:** <Any named flag, old navigators, packages, config and tests; when the owner stays, what the plan replaced; for hop only, the named scaffolding>
+- **Change:** <The removal list: any named flag, and the specific old packages, imports, components, files, config and tests. Nothing the target keeps.>
 - **Ships as:** <New binary when native dependencies change>
 - **User-visible:** nothing
 - **Verify:**
 - **Roll back:** <The previous binary. With a flag, this step removes the kill switch, so it runs only after the bake.>
-- **Done when:** <with a flag: the inventory run with `--flag '<flag name>'` shows `signals.flagName.count` as 0;> the old navigation's signals pass <the row for this plan in the clean exit in migration-planning.md>; removed packages are gone from the lockfile; doctor, typecheck, lint, E2E and the URL table pass.
+- **Done when:** <with a flag: the inventory run with `--flag '<flag name>'` shows `signals.flagName.count` as 0;> everything on the removal list is gone from the lockfile and targeted searches; remaining inventory hits on old navigation are confirmed or dismissed by reading the code; doctor, typecheck, lint, E2E and the URL table pass.
 
 ## Open questions
 
