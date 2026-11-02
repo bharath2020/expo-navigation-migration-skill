@@ -1,0 +1,7 @@
+{
+  "name": "tab-sections",
+  "version": "1.0.0",
+  "description": "A SwiftUI TabView with TabSection groups, for @expo/ui",
+  "main": "index.tsx",
+  "private": true
+}
