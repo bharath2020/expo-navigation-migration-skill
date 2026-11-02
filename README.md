@@ -61,7 +61,7 @@ expo-navigation-migration/
 ## Requirements
 
 - An agent that can read files and run Node 18 or later.
-- The target repository can be on any SDK. Plans take apps below SDK 58 through one SDK at a time.
+- The target repository can be on any SDK. Plans take apps below SDK 58 through one SDK at a time. A React Native app without Expo adopts Expo first.
 - Using the patterns needs Expo SDK 58. The prototype ran `expo` 58.0.19, `expo-router` 58.0.26, `@expo/ui` 58.0.23, React Native 0.88 and `react-native-screens` 4.30.
 - The sidebar section and placement modules need a development build.
 
@@ -99,6 +99,7 @@ What are our options for Surface Duo?
 - API facts were checked against Expo's docs and the SDK 58 packages on 2026-11-02. Expo changes every SDK, so the skill tells the agent to re-check versioned docs.
 - Choosing old or new navigation in a custom entry point, and hosting a legacy tree under Router, are not documented by Expo and were not run in the prototype. The skill labels them and requires a spike.
 - Nothing here was run on plain React Navigation without Expo Router.
+- Adopting Expo in a React Native app without it follows Expo's docs and was not run here. The plan labels that step as unproven and requires a spike.
 - There is no official migration guide for `react-native-navigation` or `react-router-native`.
 
 ## Tests

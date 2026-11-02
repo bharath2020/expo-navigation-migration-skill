@@ -3,26 +3,27 @@
 // Usage: node inventory-navigation.mjs <repo-root> [--max-locations N] [--flag <regex>]
 // Prints JSON to stdout. Every signal carries path:line evidence. No dependencies; writes nothing.
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { basename, dirname, join, relative, sep } from 'node:path';
+import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
+import { basename, dirname, join, posix, relative, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const USAGE = `Usage: node inventory-navigation.mjs <repo-root> [--max-locations N] [--flag <regex>]
   --max-locations N  Evidence locations per signal (default 8). Re-run with 200 when a signal reports truncated > 0.
-  --flag <regex>     Add signals.flagName, scanned across JS, native and JSON files. Count 0 means the named flag is gone.
-Comment-only lines are skipped, including for --flag.
+  --flag <regex>     Add signals.flagName, scanned across JS, native, JSON, YAML, .env*, plist, XML, Gradle and properties files. Count 0 means none of those files names the flag.
+Lines starting with //, /* or * are skipped, including for --flag. Lines starting with # still count.
 `;
+const SKILL_DIR = dirname(dirname(fileURLToPath(import.meta.url)));
 const SKIP_DIRS = new Set([
   'node_modules', '.git', 'Pods', 'build', 'dist', '.expo', '.gradle', 'vendor', 'DerivedData',
   '.next', '.turbo', 'coverage', '.yarn', '.bun', '.pnpm-store', 'web-build',
 ]);
 const JS_EXT = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
 const NATIVE_EXT = /\.(swift|kt|java|m|mm)$/;
-const FLAG_EXT = new RegExp(`${JS_EXT.source}|${NATIVE_EXT.source}|\\.json$`);
+const FLAG_EXT = new RegExp(`${JS_EXT.source}|${NATIVE_EXT.source}|\\.(json|ya?ml|plist|xml|gradle|kts|properties)$|(^|[\\\\/])\\.env[^\\\\/]*$`);
 const TEST_PATH = /(^|\/)(__tests__|__mocks__|tests?|e2e)\/|\.(test|spec)\.[a-z]+$/;
 const COMMENT_LINE = /^\s*(\/\/|\*|\/\*)/;
-const IMPORT_LINE = /^\s*(import\b|export\b.*\bfrom\b|\}\s*from\b|(const|let|var)\b.*=\s*require\()/;
 const MAX_FILE_BYTES = 2_000_000;
-const NO_HITS = { count: 0, fileCount: 0, importOnlyFileCount: 0, testOnly: false, locations: [], truncated: 0 };
+const NO_HITS = { count: 0, fileCount: 0, testOnly: false, locations: [], truncated: 0 };
 
 const NAV_PACKAGES = [
   /^expo$/, /^react-native$/, /^react$/, /^expo-router$/, /^@react-navigation\//, /^@expo\/ui$/,
@@ -41,6 +42,7 @@ const NAV_SEARCH = /\.searchable\b|role:?\s*\.search\b|role=["']search["']|\bSta
 
 const JS_SIGNALS = {
   // Legacy or current navigators
+  'react-navigation:import': /['"]@react-navigation\//,
   'react-navigation:container': /\bNavigationContainer\b|createNavigationContainerRef|createStaticNavigation/,
   'react-navigation:native-stack': /\bcreateNativeStackNavigator\b/,
   'react-navigation:js-stack': /\bcreateStackNavigator\b/,
@@ -66,7 +68,7 @@ const JS_SIGNALS = {
   'expo-ui:swift-ui': /['"]@expo\/ui\/swift-ui(\/[^'"]*)?['"]/,
   'expo-ui:jetpack-compose': /['"]@expo\/ui\/jetpack-compose(\/[^'"]*)?['"]/,
   'expo-ui:universal': /['"]@expo\/ui['"]/,
-  'expo-ui:nav-containers': /\b(NavigationStack|NavigationSplitView|NavigationLink|NavigationDestination|\w*TabView|\w*TabSection|NavigationBar|TopAppBar|ModalBottomSheet|BottomSheet|Popover|Toolbar(Item)?)\b/,
+  'expo-ui:nav-containers': /(?<!\bStack\.)\b(NavigationStack|NavigationSplitView|NavigationLink|NavigationDestination|\w*TabView|\w*TabSection|NavigationBar|TopAppBar|ModalBottomSheet|BottomSheet|Popover|Toolbar(Item)?)\b/,
   // Behaviours that decide the migration
   'back:prevent-remove': /\busePreventRemove\b|['"]beforeRemove['"]/,
   'back:android-handler': /\bBackHandler\b/,
@@ -140,7 +142,7 @@ function walk(root) {
       const full = join(dir, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) {
-        if (!SKIP_DIRS.has(entry.name)) stack.push(full);
+        if (!SKIP_DIRS.has(entry.name) && full !== SKILL_DIR) stack.push(full);
       } else if (entry.isFile()) {
         files.push(full);
       }
@@ -239,8 +241,12 @@ function appConfigFindings(root, files) {
   return configs;
 }
 
+const routeBase = (file) => file.replace(/(\.(ios|android|native|web))?\.[a-z]+$/, '');
+const isLayout = (file) => /(^|\/)_layout$/.test(routeBase(file));
+const isSpecialRoute = (file) => /(^|\/)\+[^/]*$/.test(routeBase(file));
+
 function routeFindings(root, files) {
-  const layouts = files.filter((file) => /(^|\/)_layout\.(tsx|ts|jsx|js)$/.test(file.split(sep).join('/')));
+  const layouts = files.filter((file) => JS_EXT.test(file) && isLayout(file.split(sep).join('/')));
   const roots = new Set();
   for (const layout of layouts) {
     const parts = layout.split(sep);
@@ -253,9 +259,9 @@ function routeFindings(root, files) {
       .map((file) => relative(routeRoot, file).split(sep).join('/'));
     return {
       path: relative(root, routeRoot),
-      routeCount: routeFiles.filter((file) => !/(^|\/)(_layout|\+[^/]*)\.[a-z]+$/.test(file)).length,
-      layouts: routeFiles.filter((file) => /(^|\/)_layout\.[a-z]+$/.test(file)),
-      specialFiles: routeFiles.filter((file) => /(^|\/)\+[^/]*\.[a-z]+$/.test(file)),
+      routeCount: new Set(routeFiles.filter((file) => !isLayout(file) && !isSpecialRoute(file)).map(routeBase)).size,
+      layouts: routeFiles.filter(isLayout),
+      specialFiles: routeFiles.filter(isSpecialRoute),
       groups: [...new Set(routeFiles.flatMap((file) => file.match(/\([^)/]+\)/g) ?? []))],
       dynamicRoutes: routeFiles.filter((file) => /\[[^\]]+\]/.test(file)),
       routes: routeFiles,
@@ -264,7 +270,7 @@ function routeFindings(root, files) {
 }
 
 function scanSignals(root, files, signals, extension, maxLocations) {
-  const results = Object.fromEntries(Object.keys(signals).map((key) => [key, { count: 0, files: new Set(), usageFiles: new Set(), locations: [], testOnly: true, nonTestCount: 0 }]));
+  const results = Object.fromEntries(Object.keys(signals).map((key) => [key, { count: 0, files: new Set(), locations: [], testOnly: true, nonTestCount: 0 }]));
   for (const file of files.filter((f) => extension.test(f))) {
     let stat;
     try {
@@ -283,7 +289,6 @@ function scanSignals(root, files, signals, extension, maxLocations) {
         const result = results[key];
         result.count += 1;
         result.files.add(path);
-        if (!IMPORT_LINE.test(line)) result.usageFiles.add(path);
         if (!isTest) {
           result.testOnly = false;
           result.nonTestCount += 1;
@@ -298,7 +303,6 @@ function scanSignals(root, files, signals, extension, maxLocations) {
       .map(([key, result]) => [key, {
         count: result.count,
         fileCount: result.files.size,
-        importOnlyFileCount: result.files.size - result.usageFiles.size,
         testOnly: result.testOnly,
         locations: result.locations,
         truncated: result.nonTestCount - result.locations.length,
@@ -312,6 +316,14 @@ function structureFindings(root, files) {
   const localExpoModules = dirsWith((path) => /(^|\/)expo-module\.config\.json$/.test(path));
   // A module at the repository root has dir '.', which matches nothing here, so its example app stays listed.
   const insideModule = (path) => localExpoModules.some((dir) => path.startsWith(`${dir}/`));
+  const manifests = paths.filter((path) => basename(path) === 'package.json');
+  const packageDirs = new Set(['.', ...manifests.map((path) => dirname(path))]);
+  const mains = new Set(manifests.flatMap((path) => {
+    const main = readJson(join(root, path))?.main;
+    return typeof main === 'string' ? [posix.join(dirname(path), main)] : [];
+  }));
+  const isEntry = (path) => mains.has(path)
+    || (packageDirs.has(dirname(path)) && /^(index|App|entry)(\.(ios|android|native|web))?\.(tsx|ts|jsx|js)$/.test(basename(path)));
   return {
     lockfiles: paths.filter((path) => /(^|\/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|bun\.lockb?)$/.test(path)),
     monorepoConfig: paths.filter((path) => /(^|\/)(pnpm-workspace\.yaml|turbo\.json|nx\.json|lerna\.json)$/.test(path)),
@@ -326,7 +338,7 @@ function structureFindings(root, files) {
     configPlugins: paths.filter((path) => /(^|\/)(app\.plugin\.(js|ts|cjs)|plugins?\/[^/]+\.(js|ts|cjs))$/.test(path)),
     patches: paths.filter((path) => /(^|\/)patches\/.+\.patch$/.test(path)),
     navigationPatches: paths.filter((path) => /(^|\/)patches\/.*(navigation|screens|expo-router|expo%2Bui|expo\+ui|@expo).*\.patch$/.test(path)),
-    customEntries: paths.filter((path) => /(^|\/)(index|App|entry)\.(tsx|ts|jsx|js)$/.test(path) && !/(^|\/)src\/app\//.test(path) && !insideModule(path)).slice(0, 40),
+    customEntries: paths.filter((path) => isEntry(path) && !insideModule(path)),
     e2e: {
       maestro: dirsWith((path) => /(^|\/)\.?maestro\/.+\.ya?ml$/.test(path)),
       detox: paths.filter((path) => /(^|\/)\.detoxrc(\.(js|json))?$/.test(path)),
@@ -339,15 +351,16 @@ function structureFindings(root, files) {
 }
 
 function main() {
-  const { root, maxLocations, flag, help, invalid } = args(process.argv.slice(2));
+  const { root: target, maxLocations, flag, help, invalid } = args(process.argv.slice(2));
   if (help) {
     process.stdout.write(USAGE);
     return;
   }
-  if (invalid || !root || !existsSync(root) || !statSync(root).isDirectory()) {
+  if (invalid || !target || !existsSync(target) || !statSync(target).isDirectory()) {
     process.stderr.write(USAGE);
     process.exit(2);
   }
+  const root = realpathSync(target);
   const files = walk(root);
   // Always present when asked for: an absent signal would not distinguish "gone" from "not checked".
   const flagName = flag && (scanSignals(root, files, { flagName: flag }, FLAG_EXT, maxLocations).flagName ?? NO_HITS);

@@ -35,7 +35,7 @@ What would change this recommendation:
 
 **Flag:** where it is read, its store, its default, the kill switch, the telemetry label. Where the app has no channel or telemetry, say so and say what stands in.
 
-**What the flag does not cover:** <SDK hops, native dependencies>
+**What the flag does not cover:** <Adopting Expo, SDK hops, native dependencies>
 
 ## (b) Switching without a feature flag
 
@@ -74,7 +74,7 @@ Steps that depend on an open question sit in a conditional track, named after th
 - **User-visible:** nothing
 - **Verify:**
 - **Roll back:** <The previous binary. With a flag, this step removes the kill switch, so it runs only after the bake.>
-- **Done when:** the inventory run with `--flag '<flag name>'` shows no `flagName` signal and none of <old library signals>; packages are gone from the lockfile; doctor, typecheck, lint, E2E and the URL table pass.
+- **Done when:** the inventory run with `--flag '<flag name>'` shows `signals.flagName.count` as 0 and none of <old library signals, from the clean exit in migration-planning.md>; packages are gone from the lockfile; doctor, typecheck, lint, E2E and the URL table pass.
 
 ## Open questions
 

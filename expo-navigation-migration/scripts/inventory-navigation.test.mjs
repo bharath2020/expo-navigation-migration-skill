@@ -1,7 +1,7 @@
 // Run with: node --test expo-navigation-migration/scripts/inventory-navigation.test.mjs
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, before, test } from 'node:test';
@@ -240,16 +240,107 @@ test('comment-only lines do not match, and code after a comment marker still doe
   assert.equal(output.nativeSignals['native:multi-window'], undefined);
 });
 
-test('importOnlyFileCount counts files whose only hits are import lines', () => {
+test('a skill installed inside the project does not scan itself', () => {
+  const dir = fixture({ 'src/home.tsx': 'export const home = 1;\n' });
+  const installed = join(dir, '.claude/skills/expo-navigation-migration');
+  cpSync(dirname(dirname(script)), installed, { recursive: true });
+  const installedScript = join(installed, 'scripts/inventory-navigation.mjs');
+  for (const [cwd, target] of [[undefined, dir], [dir, '.']]) {
+    const output = JSON.parse(execFileSync(process.execPath, [installedScript, target], { encoding: 'utf8', cwd }));
+    assert.equal(output.scannedFiles, 1);
+    assert.deepEqual(output.signals, {});
+    assert.deepEqual(output.nativeSignals, {});
+    assert.deepEqual(output.packages, []);
+    assert.deepEqual(output.structure.localExpoModules, []);
+  }
+});
+
+test('--flag finds the flag in E2E, CI, env and native config files', () => {
+  const files = [
+    '.maestro/smoke.yaml',
+    '.github/workflows/ci.yml',
+    '.env',
+    '.env.production',
+    'ios/App/Info.plist',
+    'android/app/src/main/res/values/flags.xml',
+    'android/app/build.gradle',
+    'android/settings.gradle.kts',
+    'android/gradle.properties',
+  ];
+  const dir = fixture(Object.fromEntries(files.map((path) => [path, 'newNavShell\n'])));
+  const { flagName } = inventory(dir, '--flag', 'newNavShell', '--max-locations', '20').signals;
+  assert.equal(flagName.count, files.length);
+  assert.deepEqual([...flagName.locations].sort(), files.map((path) => `${path}:1`).sort());
+});
+
+test('a Router-only app hits no signal the clean exit treats as the old library', () => {
   const dir = fixture({
-    'src/one-line.tsx': "import { Host } from '@expo/ui/swift-ui';\nexport const a = 1;\n",
-    'src/multi-line.tsx': "import {\n  Host,\n} from '@expo/ui/swift-ui';\nexport const b = 1;\n",
-    'src/required.js': "const ui = require('@expo/ui/swift-ui');\n",
-    'src/used.tsx': "const load = () => import('x');\nexport const c = load('@expo/ui/swift-ui');\n",
+    'app/_layout.tsx': "import { Stack, useNavigation, useFocusEffect } from 'expo-router';\n",
+    'app/index.tsx': [
+      'const navigation = useNavigation();',
+      'useFocusEffect(callback);',
+      'navigation.setOptions({ title });',
+      '<Stack.Toolbar placement="right"><Stack.Toolbar.Button /></Stack.Toolbar>;',
+    ].join('\n'),
   });
-  const signal = inventory(dir).signals['expo-ui:swift-ui'];
-  assert.equal(signal.fileCount, 4);
-  assert.equal(signal.importOnlyFileCount, 3);
+  const { signals } = inventory(dir);
+  for (const key of ['import', 'container', 'native-stack', 'js-stack', 'bottom-tabs', 'top-tabs', 'drawer']) {
+    assert.equal(signals[`react-navigation:${key}`], undefined, key);
+  }
+  assert.equal(signals['expo-ui:nav-containers'], undefined);
+  assert.equal(signals['expo-router:stack-toolbar'].count, 1);
+});
+
+test('react-navigation:import finds the package, and not Router\'s own entry', () => {
+  const dir = fixture({
+    'src/old.ts': "import { useRoute } from '@react-navigation/native';\n",
+    'src/required.js': "const stack = require('@react-navigation/stack');\n",
+    'src/router.ts': "import { useRoute } from 'expo-router/react-navigation';\n",
+  });
+  assert.deepEqual(inventory(dir).signals['react-navigation:import'].locations, ['src/old.ts:1', 'src/required.js:1']);
+});
+
+test('a React Native app without Expo reports expo as absent', () => {
+  const dir = fixture({ 'package.json': JSON.stringify({ name: 'bare', dependencies: { 'react-native': '0.83.0' } }) });
+  const [pkg] = inventory(dir).packages;
+  assert.equal(pkg.isExpoApp, false);
+  assert.equal(pkg.navigation['react-native'], '0.83.0');
+  assert.equal(pkg.navigation.expo, undefined);
+});
+
+test('platform-specific route files classify like their plain counterparts', () => {
+  const dir = fixture({
+    'app/(tabs)/_layout.tsx': 'export {};\n',
+    'app/(tabs)/_layout.ios.tsx': 'export {};\n',
+    'app/(tabs)/index.tsx': 'export {};\n',
+    'app/(tabs)/index.web.tsx': 'export {};\n',
+    'app/+not-found.ios.tsx': 'export {};\n',
+    'ios-only/app/_layout.ios.tsx': 'export {};\n',
+  });
+  const [tree, iosOnly] = inventory(dir).routeTrees;
+  assert.equal(tree.routeCount, 1);
+  assert.deepEqual(tree.layouts, ['(tabs)/_layout.ios.tsx', '(tabs)/_layout.tsx']);
+  assert.deepEqual(tree.specialFiles, ['+not-found.ios.tsx']);
+  assert.equal(iosOnly.path, 'ios-only/app');
+  assert.deepEqual(iosOnly.layouts, ['_layout.ios.tsx']);
+});
+
+test('customEntries lists package roots and mains, not routes or barrels', () => {
+  const barrels = Object.fromEntries(
+    Array.from({ length: 45 }, (_, i) => [`src/components/c${i}/index.ts`, 'export {};\n'])
+  );
+  const dir = fixture({
+    ...barrels,
+    'package.json': JSON.stringify({ main: './index.js' }),
+    'index.js': 'export {};\n',
+    'index.android.js': 'export {};\n',
+    'app/_layout.tsx': 'export {};\n',
+    'app/(tabs)/index.tsx': 'export {};\n',
+    'apps/mobile/package.json': JSON.stringify({ main: 'src/bootstrap.tsx' }),
+    'apps/mobile/src/bootstrap.tsx': 'export {};\n',
+    'apps/router/package.json': JSON.stringify({ main: 'expo-router/entry' }),
+  });
+  assert.deepEqual(inventory(dir).structure.customEntries, ['apps/mobile/src/bootstrap.tsx', 'index.android.js', 'index.js']);
 });
 
 test('new signals: private router imports, search, scene config, idiom layout', () => {
@@ -336,6 +427,7 @@ test('customEntries excludes local module entries, and modules report their plat
     'modules/alpha/src/index.ts': 'export {};\n',
     'modules/beta/expo-module.config.json': '{}',
     'modules/beta/index.tsx': 'export {};\n',
+    'modules/not-a-module/package.json': '{}',
     'modules/not-a-module/index.ts': 'export {};\n',
   });
   const { structure } = inventory(dir);
@@ -347,6 +439,7 @@ test('customEntries excludes local module entries, and modules report their plat
 test('a module config at the repository root does not hide every entry', () => {
   const dir = fixture({
     'expo-module.config.json': JSON.stringify({ platforms: ['android'] }),
+    'example/package.json': '{}',
     'example/App.tsx': 'export {};\n',
   });
   const { structure } = inventory(dir);

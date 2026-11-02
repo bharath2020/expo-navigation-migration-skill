@@ -20,7 +20,7 @@ Read [patterns/verification.md](patterns/verification.md) for what status words 
 | Bottom toolbar | [bottom-toolbar.md](patterns/bottom-toolbar.md) | The iOS 26 tab bar overlap and its fix |
 | React Navigation chrome around a SwiftUI or Compose body | [mixed-content.md](patterns/mixed-content.md) | The recommended mix, and what was observed |
 | Two shells in one app | [shell-coexistence.md](patterns/shell-coexistence.md) | Mounting @expo/ui as one route; the base of the route seam |
-| Thin TypeScript layer between screens and router | [navigation-api-layer.md](patterns/navigation-api-layer.md) | Tab config, presentation helpers, navbar store, Android navigation summary, testing guidance |
+| Thin TypeScript layer between screens and router | [navigation-api-layer.md](patterns/navigation-api-layer.md) | Tab config, presentation helpers, navbar store, navigation facade sketch, Android navigation summary, testing guidance |
 | Every known gap and bug, with fixes | [gaps-and-bugs.md](patterns/gaps-and-bugs.md) | Checking a feature before promising it |
 
 ## Never built

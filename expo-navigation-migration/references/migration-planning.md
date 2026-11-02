@@ -48,10 +48,11 @@ Steps 0 to 3 pay off even if the migration stops there.
 
 | # | Step | Notes | Skip when |
 | --- | --- | --- | --- |
+| A | **Adopt Expo** | The first step for an app with `react-native` and no `expo`, which the inventory shows as `isExpoApp: false` with no `expo` under `navigation`. Follow Expo's [guide for existing React Native apps](https://docs.expo.dev/bare/overview/): [install Expo modules](https://docs.expo.dev/bare/installing-expo-modules/) with `npx install-expo-modules@latest`, or by hand if the project differs significantly from a default React Native project, then [use Expo CLI](https://docs.expo.dev/bare/using-expo-cli/). Navigation does not change, and this ships as a new binary. The install page does not say which SDK you get, so read the installed `expo` version, and start step 1 from it. **Unproven: from Expo's docs, not run here.** Label it in the plan. Spike on a branch, which passes when a release build starts on each shipped platform with navigation unchanged. | `expo` is already a dependency |
 | 0 | **Baseline** | E2E flows for every parity row that has none. URL table as a test list. Record crash-free rate and start time where a reporter exists; otherwise record that and add one if the ramp needs it. Add `testID`s. | Never |
 | 1 | **SDK hops** | One release per SDK, on old navigation. [api-mapping.md](api-mapping.md). | Already on 58 |
 | 2 | **Standalone improvements** | Ship what is worth having whatever happens: serializable params, split screen files, no `null` root, native stack in place of a JS stack, safe-area fixes. | Nothing qualifies |
-| 3 | **Navigation facade** | Route names and a small API in one module: `goTo`, `back`, `canGoBack`, back guard. Move call sites over. Replace global refs. See [patterns/navigation-api-layer.md](patterns/navigation-api-layer.md). No behaviour change. | Screen seam only, hop only, or no navigation calls to wrap |
+| 3 | **Navigation facade** | Route names and a small API in one module: `goTo`, `back`, `canGoBack`, back guard. Move call sites over. Replace global refs. The module imports no router, and each adapter loads only on its own branch. See the [sketch](patterns/navigation-api-layer.md#navigation-facade), which was not run. No behaviour change. | Screen seam only, hop only, or no navigation calls to wrap |
 | 4 | **Native dependencies, dark** | New binary containing the target's packages, unused. Bump the runtime version. Run the full baseline. Proves the binary before any code depends on it. | The binary already has them |
 | 5 | **Seam and flag** | Flag read, default old, kill switch, telemetry label. Any seam with a spike: the spike comes first and must pass. | No flag |
 | 6 | **First vertical slice, internal** | One low-traffic flow end to end on the new shell, with the flag on for developers only. | Hop only |
@@ -86,7 +87,17 @@ Ships as a new binary when native dependencies change, and otherwise as whatever
 
 Done when:
 
-- `node <skill>/scripts/inventory-navigation.mjs <repo> --flag '<flag name>'` reports no `flagName` signal, and none of the old library's signals. For an @expo/ui shell, `expo-ui:nav-containers` and `native:swiftui-navigation` are gone, or remain only in a named self-contained flow
+- `node <skill>/scripts/inventory-navigation.mjs <repo> --flag '<flag name>'` reports `signals.flagName.count` as 0, and the old navigation's signals pass:
+
+  | Old navigation | Signals |
+  | --- | --- |
+  | React Navigation | `react-navigation:import`, `:container`, `:native-stack`, `:js-stack`, `:bottom-tabs`, `:top-tabs` and `:drawer` are absent. A `create*Navigator` hit may stay only if it imports from `expo-router/*`. |
+  | Wix | `wix-navigation` is absent |
+  | `react-router-native` | `react-router-native` is absent |
+  | @expo/ui shell | `expo-ui:nav-containers` and `native:swiftui-navigation` are absent, or remain only in a named self-contained flow |
+  | Hop only | No signal check: navigation keeps its owner |
+
+  Leave `react-navigation:hooks`, `:imperative` and `:set-options` out of this check. They also match Router's own `useNavigation`, `useFocusEffect` and `navigation.setOptions`.
 - old packages are gone from the lockfile
 - `npx expo-doctor`, typecheck, lint and the full E2E baseline pass
 - the URL table passes

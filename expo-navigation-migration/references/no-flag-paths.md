@@ -62,7 +62,7 @@ For the hop-only outcome: the owner of navigation stays, and one binary per SDK 
 
 ## Any path
 
-- Upgrade the SDK first, in its own releases.
+- Adopt Expo if the app has no `expo`, then upgrade the SDK, in their own releases, before the switch.
 - Freeze navigation changes for the cut window. Short-lived branches only.
 - Publish no OTA that assumes the new native code to binaries with the old runtime version. Use the `fingerprint` runtime version policy, or bump by hand.
 - Set abort conditions before the rollout starts: crash-free rate, deep link failure rate, and any flow that fails E2E.

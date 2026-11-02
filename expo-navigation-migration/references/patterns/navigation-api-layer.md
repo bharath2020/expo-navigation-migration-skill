@@ -13,6 +13,7 @@ A thin TypeScript layer sits between screens and the router, so tabs, presentati
 | Navbar store | verified | verified | n/a: React state | n/a: React state |
 | Back guard | verified: `usePreventRemove` | verified: `usePreventRemove` | gap: own buttons only | partial: confirm in `BackHandler` |
 | Unit tests for the helpers | not exercised: prototype has none | not exercised: prototype has none | n/a | n/a |
+| Navigation facade | not exercised: prototype has none | not exercised: prototype has none | n/a | n/a |
 
 Every `verified` cell ran on a simulator or emulator.
 
@@ -261,6 +262,84 @@ const disablePrevention = usePreventRemove(dirty, ({ repeat }) => {
   }}
 />
 ```
+
+## Navigation facade
+
+Not from the prototype, whose screens call `router.*` directly. This is a sketch for a migration, and it was not run. Replace the route names and params with the app's own.
+
+Screens import only the facade, so they stay shared while old and new navigation coexist. The facade imports no navigation library. Importing `expo-router` sets a global `react-native-screens` flag at module load, so under the [Entry seam](../flag-seams.md#entry-seam) a static `import { router } from 'expo-router'` here would change the legacy branch.
+
+```ts
+// src/navigation/facade.ts
+export type Target = { route: 'home' } | { route: 'item'; id: string };
+
+export type Navigator = {
+  goTo(target: Target): void;
+  back(): void;
+  canGoBack(): boolean;
+  useBackGuard(dirty: boolean, confirm: (leave: () => void) => void): void;
+};
+
+let navigator: Navigator | undefined;
+
+export function installNavigator(next: Navigator) {
+  navigator = next;
+}
+
+function current() {
+  if (!navigator) throw new Error('installNavigator has not run');
+  return navigator;
+}
+
+export const goTo = (target: Target) => current().goTo(target);
+export const back = () => current().back();
+export const canGoBack = () => current().canGoBack();
+export const useBackGuard: Navigator['useBackGuard'] = (dirty, confirm) =>
+  current().useBackGuard(dirty, confirm);
+```
+
+Each adapter loads only on its own branch. Install it before that branch's first render: the legacy root module installs the first, and the root `_layout` module installs the second.
+
+```ts
+// src/legacy/navigator.ts: imported only by the legacy root
+import { createNavigationContainerRef, usePreventRemove } from '@react-navigation/native';
+import type { Navigator } from '../navigation/facade';
+
+export const navigationRef = createNavigationContainerRef<LegacyParams>();
+
+export const legacyNavigator: Navigator = {
+  goTo: (target) =>
+    target.route === 'item'
+      ? navigationRef.navigate('Item', { id: target.id })
+      : navigationRef.navigate('Home'),
+  back: () => navigationRef.goBack(),
+  canGoBack: () => navigationRef.canGoBack(),
+  useBackGuard: (dirty, confirm) =>
+    usePreventRemove(dirty, ({ data }) => confirm(() => navigationRef.dispatch(data.action))),
+};
+```
+
+```ts
+// src/navigation/router-navigator.ts: imported only by the root _layout
+import { router, usePreventRemove } from 'expo-router';
+import type { Navigator } from './facade';
+
+export const routerNavigator: Navigator = {
+  goTo: (target) =>
+    target.route === 'item'
+      ? router.push({ pathname: '/item/[id]', params: { id: target.id } })
+      : router.navigate('/'),
+  back: () => router.back(),
+  canGoBack: () => router.canGoBack(),
+  useBackGuard: (dirty, confirm) => {
+    usePreventRemove(dirty, ({ repeat }) => confirm(repeat));
+  },
+};
+```
+
+- `router.*` throws before the first router render, so a call from outside React still has to wait for it.
+- The flag is read once per launch, so `useBackGuard` resolves to the same hook on every render.
+- A screen that needs the iOS back-menu setting from [Back guard](#back-guard) still sets it in its own options.
 
 ## @expo/ui
 

@@ -12,6 +12,7 @@ Expo recommends "upgrading SDK versions incrementally, one at a time". Each hop 
 
 | From | Stop for |
 | --- | --- |
+| No `expo` yet | Adopt Expo first: step A of [the ladder](migration-planning.md#the-ladder). Then hop from the SDK it installs. |
 | 54 or earlier | Move to the New Architecture before SDK 55. |
 | 55 to 56 | `expo-router` drops `@react-navigation/*`. Imports move, with a codemod: `npx expo-codemod sdk-56-expo-router-react-navigation-replace src`. |
 | 56 | Known Hermes memory regression. Expo recommends moving on to 57, so do not park here. |

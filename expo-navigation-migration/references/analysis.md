@@ -22,7 +22,7 @@ Cover all of them, in this order. In a monorepo, repeat 2 to 9 for each app the 
 Package manager, workspaces, which packages are apps, shared navigation packages. Project rules in `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md` that constrain a migration.
 
 ### 2. Versions
-Resolved versions of `expo`, `react-native`, `react`, `expo-router`, `@react-navigation/*`, `react-native-screens`, `@expo/ui`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-safe-area-context`. For SDK 54 or earlier, whether the New Architecture is on: it is mandatory from SDK 55.
+Resolved versions of `expo`, `react-native`, `react`, `expo-router`, `@react-navigation/*`, `react-native-screens`, `@expo/ui`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-safe-area-context`. For SDK 54 or earlier, whether the New Architecture is on: it is mandatory from SDK 55. If an app has `react-native` and no `expo`, record that: its plan starts by adopting Expo.
 
 ### 3. Archetype
 Assign one. It drives the seam and the target.
