@@ -21,11 +21,11 @@ First ask whether the recommendation changes who owns navigation.
 
 | Seam | Fits | Flag chooses | Evidence |
 | --- | --- | --- | --- |
-| **Screen** | A routed screen whose body changes to or from @expo/ui | Body of one screen: React Native or @expo/ui. Chooses nothing in an app with no React Native bodies. | Verified in the prototype ([mixed-content](patterns/mixed-content.md)) |
+| **Screen** | A routed screen whose body changes to or from @expo/ui | Body of one screen: React Native or @expo/ui. Chooses nothing in an app with no React Native bodies. | A mixed screen ran at its own route ([mixed-content](patterns/mixed-content.md)). A flag choosing the body was not run. Spike: in a release build, the screen renders and its baseline flows pass under both values. |
 | **Route** | R, or U with Router as its host | Which route or layout renders: a Router screen, or an @expo/ui shell mounted as one route | The @expo/ui shell route was verified as a user-triggered switch ([shell-coexistence](patterns/shell-coexistence.md)). A layout choosing a navigator, or a screen choosing its implementation, was not run. A flag driving either form was not run, so both have a spike. |
 | **Navigator** | N staying on plain React Navigation | Which navigator a stack uses, for example JS stack or native stack | Standard API. Not in the prototype. No official option-by-option mapping exists, so audit each header option. |
 | **Hosted tree** | N, when entry seam spike fails | Router is the root. A legacy tree runs as an isolated embedded tree under one route. | Narrow official carve-out, written for embedded trees. Not run here. |
-| **Entry** | N, W, X moving to Router | Which root registers at launch | **Not documented, not run.** Needs the spike below. |
+| **Entry** | N, W, X, or U with no Router host, moving to Router | Which root registers at launch | **Not documented, not run.** Needs the spike below. |
 
 `Stack.Protected` is access control, so keep it for auth rather than as a shell switch. From SDK 58 a guard that fails renders a redirect.
 
