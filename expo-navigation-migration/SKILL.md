@@ -39,7 +39,7 @@ Follow [references/migration-planning.md](references/migration-planning.md). It 
 - [references/no-flag-paths.md](references/no-flag-paths.md): the switch when a flag is not possible
 - [references/api-mapping.md](references/api-mapping.md): SDK hops, import replacements, breaking changes
 
-Fill [templates/migration-plan.md](templates/migration-plan.md). The plan always covers the flagged switch, the no-flag switch, ordered steps that each ship and verify alone, and a clean exit that removes the flag and the old navigation. It names one recommendation with reasons from this repository. That recommendation can be to keep the current owner of navigation; the plan then says there is nothing to flag, and why.
+Fill [templates/migration-plan.md](templates/migration-plan.md). The plan always covers the flagged switch, the no-flag switch, ordered steps that each ship and verify alone, and a clean exit that removes any flag and what the plan replaced. It names one recommendation with reasons from this repository. That recommendation can be to keep the current owner of navigation; when only the SDK moves, the plan says there is nothing to flag, and why.
 
 ## Look up a pattern
 

@@ -13,7 +13,7 @@ It also carries a catalog of navigation patterns, each built both ways in a prot
 - **A recommendation** between the targets, with reasons from your code.
 - **The switch behind a feature flag**: where the flag can sit, what is documented, and what needs a spike with pass conditions before you depend on it.
 - **The switch when a flag is not possible**: how to replace what a flag gives you, including the weak point, rollback.
-- **Ordered incremental steps**, each shippable and verifiable alone, ending in a clean exit that removes the flag and the old navigation, with a checkable finish.
+- **Ordered incremental steps**, each shippable and verifiable alone, ending in a clean exit that removes any flag and what the plan replaced, with a checkable finish.
 
 **Answers pattern questions** from the catalog, with code from the prototype, status per platform and known gaps.
 
@@ -97,7 +97,7 @@ What are our options for Surface Duo?
 ## Limits
 
 - API facts were checked against Expo's docs and the SDK 58 packages on 2026-11-02. Expo changes every SDK, so the skill tells the agent to re-check versioned docs.
-- Choosing old or new navigation in a custom entry point, and hosting a legacy tree under Router, are not documented by Expo and were not run in the prototype. The skill labels them and requires a spike.
+- The prototype has no feature flag, so no seam ran with a flag driving it. Choosing old or new navigation in a custom entry point is not documented by Expo, and hosting a legacy tree under Router rests on a narrow carve-out for embedded trees. Neither was run at all. The skill labels these and requires a spike.
 - Nothing here was run on plain React Navigation without Expo Router.
 - Adopting Expo in a React Native app without it follows Expo's docs and was not run here. The plan labels that step as unproven and requires a spike.
 - There is no official migration guide for `react-native-navigation` or `react-router-native`.
