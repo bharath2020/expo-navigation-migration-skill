@@ -1,0 +1,7 @@
+{
+  "name": "tab-bar-placement",
+  "version": "1.0.0",
+  "description": "SwiftUI defaultTabBarPlacement as an @expo/ui modifier",
+  "main": "index.ts",
+  "private": true
+}
