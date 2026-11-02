@@ -240,19 +240,31 @@ test('comment-only lines do not match, and code after a comment marker still doe
   assert.equal(output.nativeSignals['native:multi-window'], undefined);
 });
 
-test('a skill installed inside the project does not scan itself', () => {
+test('no copy of the skill inside the project is scanned, whichever copy runs', () => {
   const dir = fixture({ 'src/home.tsx': 'export const home = 1;\n' });
-  const installed = join(dir, '.claude/skills/expo-navigation-migration');
-  cpSync(dirname(dirname(script)), installed, { recursive: true });
-  const installedScript = join(installed, 'scripts/inventory-navigation.mjs');
-  for (const [cwd, target] of [[undefined, dir], [dir, '.']]) {
-    const output = JSON.parse(execFileSync(process.execPath, [installedScript, target], { encoding: 'utf8', cwd }));
+  const skill = dirname(dirname(script));
+  const projectCopy = join(dir, '.claude/skills/expo-navigation-migration');
+  const personalCopy = join(fixture({}), 'expo-navigation-migration');
+  cpSync(skill, projectCopy, { recursive: true });
+  cpSync(skill, join(dir, '.agents/skills/navigation'), { recursive: true });
+  cpSync(skill, personalCopy, { recursive: true });
+  for (const [copy, cwd, target] of [[projectCopy, undefined, dir], [projectCopy, dir, '.'], [personalCopy, undefined, dir]]) {
+    const copyScript = join(copy, 'scripts/inventory-navigation.mjs');
+    const output = JSON.parse(execFileSync(process.execPath, [copyScript, target], { encoding: 'utf8', cwd }));
     assert.equal(output.scannedFiles, 1);
     assert.deepEqual(output.signals, {});
     assert.deepEqual(output.nativeSignals, {});
     assert.deepEqual(output.packages, []);
     assert.deepEqual(output.structure.localExpoModules, []);
   }
+});
+
+test('another skill in the project is still scanned', () => {
+  const dir = fixture({
+    '.claude/skills/other/SKILL.md': '# other\n',
+    '.claude/skills/other/scripts/run.ts': 'createDrawerNavigator();\n',
+  });
+  assert.deepEqual(inventory(dir).signals['react-navigation:drawer'].locations, ['.claude/skills/other/scripts/run.ts:1']);
 });
 
 test('--flag finds the flag in E2E, CI, env and native config files', () => {
@@ -339,8 +351,21 @@ test('customEntries lists package roots and mains, not routes or barrels', () =>
     'apps/mobile/package.json': JSON.stringify({ main: 'src/bootstrap.tsx' }),
     'apps/mobile/src/bootstrap.tsx': 'export {};\n',
     'apps/router/package.json': JSON.stringify({ main: 'expo-router/entry' }),
+    'apps/bare/package.json': JSON.stringify({ main: 'src/entry' }),
+    'apps/bare/src/entry.tsx': 'export {};\n',
+    'apps/bare/src/entry.ios.tsx': 'export {};\n',
+    'apps/bare/src/entry.css': '',
+    'apps/folder/package.json': JSON.stringify({ main: './src' }),
+    'apps/folder/src/index.tsx': 'export {};\n',
   });
-  assert.deepEqual(inventory(dir).structure.customEntries, ['apps/mobile/src/bootstrap.tsx', 'index.android.js', 'index.js']);
+  assert.deepEqual(inventory(dir).structure.customEntries, [
+    'apps/bare/src/entry.ios.tsx',
+    'apps/bare/src/entry.tsx',
+    'apps/folder/src/index.tsx',
+    'apps/mobile/src/bootstrap.tsx',
+    'index.android.js',
+    'index.js',
+  ]);
 });
 
 test('new signals: private router imports, search, scene config, idiom layout', () => {

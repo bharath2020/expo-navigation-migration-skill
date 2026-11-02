@@ -341,6 +341,8 @@ export const routerNavigator: Navigator = {
 - The flag is read once per launch, so `useBackGuard` resolves to the same hook on every render.
 - A screen that needs the iOS back-menu setting from [Back guard](#back-guard) still sets it in its own options.
 
+The single module-level navigator holds only when one tree runs per launch, as under the [Entry seam](../flag-seams.md#entry-seam). Under the [Hosted tree seam](../flag-seams.md#hosted-tree-seam) and [no-flag path C](../no-flag-paths.md#c-slice-by-self-contained-flow), old and new trees share a runtime, so a second `installNavigator` call overwrites the first, and a shared screen can navigate in the wrong tree. There, choose the adapter by which tree owns the calling screen, for example with a `useNavigator()` hook reading a context that each tree's root provides. A call from outside React has no owning screen, so it must name its tree. This variant was not run either.
+
 ## @expo/ui
 
 The @expo/ui shells use two pieces of this layer: the tab config and, on Android, the icons hook. They have no routes, so the presentation helpers and stack options do not apply, and they keep their stacks and button counts in React state rather than the navbar store.

@@ -75,7 +75,7 @@ Router owns the root, and one route renders the legacy tree:
 - The rest of the docs say Router does not manage additional containers, and that importing `@react-navigation/*` in app code is otherwise unsupported from SDK 56.
 - Moving the entry to Router is itself not flagged, so it is a one-way step for this release.
 
-Prove these before committing: system back on Android at the boundary, deep links into legacy screens through a Router route, headers doubled or hidden, and modals presented from the embedded tree.
+Prove these before committing: system back on Android at the boundary, deep links into legacy screens through a Router route, headers doubled or hidden, modals presented from the embedded tree, and a screen shared by both trees navigating in the tree that owns it. That last check is [the facade's per-tree choice](patterns/navigation-api-layer.md#navigation-facade), which was not run.
 
 ## Entry seam
 

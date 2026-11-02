@@ -3,16 +3,14 @@
 // Usage: node inventory-navigation.mjs <repo-root> [--max-locations N] [--flag <regex>]
 // Prints JSON to stdout. Every signal carries path:line evidence. No dependencies; writes nothing.
 
-import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, join, posix, relative, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 const USAGE = `Usage: node inventory-navigation.mjs <repo-root> [--max-locations N] [--flag <regex>]
   --max-locations N  Evidence locations per signal (default 8). Re-run with 200 when a signal reports truncated > 0.
   --flag <regex>     Add signals.flagName, scanned across JS, native, JSON, YAML, .env*, plist, XML, Gradle and properties files. Count 0 means none of those files names the flag.
 Lines starting with //, /* or * are skipped, including for --flag. Lines starting with # still count.
 `;
-const SKILL_DIR = dirname(dirname(fileURLToPath(import.meta.url)));
 const SKIP_DIRS = new Set([
   'node_modules', '.git', 'Pods', 'build', 'dist', '.expo', '.gradle', 'vendor', 'DerivedData',
   '.next', '.turbo', 'coverage', '.yarn', '.bun', '.pnpm-store', 'web-build',
@@ -127,6 +125,8 @@ function args(argv) {
   return out;
 }
 
+const isSkillCopy = (dir) => existsSync(join(dir, 'SKILL.md')) && existsSync(join(dir, 'scripts/inventory-navigation.mjs'));
+
 function walk(root) {
   const files = [];
   const stack = [root];
@@ -142,7 +142,7 @@ function walk(root) {
       const full = join(dir, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) {
-        if (!SKIP_DIRS.has(entry.name) && full !== SKILL_DIR) stack.push(full);
+        if (!SKIP_DIRS.has(entry.name) && !isSkillCopy(full)) stack.push(full);
       } else if (entry.isFile()) {
         files.push(full);
       }
@@ -241,9 +241,9 @@ function appConfigFindings(root, files) {
   return configs;
 }
 
-const routeBase = (file) => file.replace(/(\.(ios|android|native|web))?\.[a-z]+$/, '');
-const isLayout = (file) => /(^|\/)_layout$/.test(routeBase(file));
-const isSpecialRoute = (file) => /(^|\/)\+[^/]*$/.test(routeBase(file));
+const stripExtension = (file) => file.replace(/(\.(ios|android|native|web))?\.[a-z]+$/, '');
+const isLayout = (file) => /(^|\/)_layout$/.test(stripExtension(file));
+const isSpecialRoute = (file) => /(^|\/)\+[^/]*$/.test(stripExtension(file));
 
 function routeFindings(root, files) {
   const layouts = files.filter((file) => JS_EXT.test(file) && isLayout(file.split(sep).join('/')));
@@ -259,7 +259,7 @@ function routeFindings(root, files) {
       .map((file) => relative(routeRoot, file).split(sep).join('/'));
     return {
       path: relative(root, routeRoot),
-      routeCount: new Set(routeFiles.filter((file) => !isLayout(file) && !isSpecialRoute(file)).map(routeBase)).size,
+      routeCount: new Set(routeFiles.filter((file) => !isLayout(file) && !isSpecialRoute(file)).map(stripExtension)).size,
       layouts: routeFiles.filter(isLayout),
       specialFiles: routeFiles.filter(isSpecialRoute),
       groups: [...new Set(routeFiles.flatMap((file) => file.match(/\([^)/]+\)/g) ?? []))],
@@ -320,9 +320,12 @@ function structureFindings(root, files) {
   const packageDirs = new Set(['.', ...manifests.map((path) => dirname(path))]);
   const mains = new Set(manifests.flatMap((path) => {
     const main = readJson(join(root, path))?.main;
-    return typeof main === 'string' ? [posix.join(dirname(path), main)] : [];
+    if (typeof main !== 'string') return [];
+    const target = posix.join(dirname(path), main);
+    return [target, posix.join(target, 'index')];
   }));
   const isEntry = (path) => mains.has(path)
+    || (JS_EXT.test(path) && mains.has(stripExtension(path)))
     || (packageDirs.has(dirname(path)) && /^(index|App|entry)(\.(ios|android|native|web))?\.(tsx|ts|jsx|js)$/.test(basename(path)));
   return {
     lockfiles: paths.filter((path) => /(^|\/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|bun\.lockb?)$/.test(path)),
@@ -351,16 +354,15 @@ function structureFindings(root, files) {
 }
 
 function main() {
-  const { root: target, maxLocations, flag, help, invalid } = args(process.argv.slice(2));
+  const { root, maxLocations, flag, help, invalid } = args(process.argv.slice(2));
   if (help) {
     process.stdout.write(USAGE);
     return;
   }
-  if (invalid || !target || !existsSync(target) || !statSync(target).isDirectory()) {
+  if (invalid || !root || !existsSync(root) || !statSync(root).isDirectory()) {
     process.stderr.write(USAGE);
     process.exit(2);
   }
-  const root = realpathSync(target);
   const files = walk(root);
   // Always present when asked for: an absent signal would not distinguish "gone" from "not checked".
   const flagName = flag && (scanSignals(root, files, { flagName: flag }, FLAG_EXT, maxLocations).flagName ?? NO_HITS);

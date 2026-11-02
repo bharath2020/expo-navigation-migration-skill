@@ -69,12 +69,12 @@ Steps that depend on an open question sit in a conditional track, named after th
 
 ### Final step: clean exit
 
-- **Change:** <The named flag, old navigators, packages, config and tests; for hop only, the named scaffolding>
+- **Change:** <Any named flag, old navigators, packages, config and tests; when the owner stays, what the plan replaced; for hop only, the named scaffolding>
 - **Ships as:** <New binary when native dependencies change>
 - **User-visible:** nothing
 - **Verify:**
 - **Roll back:** <The previous binary. With a flag, this step removes the kill switch, so it runs only after the bake.>
-- **Done when:** the inventory run with `--flag '<flag name>'` shows `signals.flagName.count` as 0 and none of <old library signals, from the clean exit in migration-planning.md>; packages are gone from the lockfile; doctor, typecheck, lint, E2E and the URL table pass.
+- **Done when:** <with a flag: the inventory run with `--flag '<flag name>'` shows `signals.flagName.count` as 0;> the old navigation's signals pass <the row for this plan in the clean exit in migration-planning.md>; removed packages are gone from the lockfile; doctor, typecheck, lint, E2E and the URL table pass.
 
 ## Open questions
 

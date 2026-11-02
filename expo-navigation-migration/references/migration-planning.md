@@ -52,7 +52,7 @@ Steps 0 to 3 pay off even if the migration stops there.
 | 0 | **Baseline** | E2E flows for every parity row that has none. URL table as a test list. Record crash-free rate and start time where a reporter exists; otherwise record that and add one if the ramp needs it. Add `testID`s. | Never |
 | 1 | **SDK hops** | One release per SDK, on old navigation. [api-mapping.md](api-mapping.md). | Already on 58 |
 | 2 | **Standalone improvements** | Ship what is worth having whatever happens: serializable params, split screen files, no `null` root, native stack in place of a JS stack, safe-area fixes. | Nothing qualifies |
-| 3 | **Navigation facade** | Route names and a small API in one module: `goTo`, `back`, `canGoBack`, back guard. Move call sites over. Replace global refs. The module imports no router, and each adapter loads only on its own branch. See the [sketch](patterns/navigation-api-layer.md#navigation-facade), which was not run. No behaviour change. | Screen seam only, hop only, or no navigation calls to wrap |
+| 3 | **Navigation facade** | Route names and a small API in one module: `goTo`, `back`, `canGoBack`, back guard. Move call sites over. Replace global refs. The module imports no router. When one tree runs per launch, each adapter loads only on its own branch. See the [sketch](patterns/navigation-api-layer.md#navigation-facade), which was not run and also covers two trees in one runtime. No behaviour change. | Screen seam only, hop only, or no navigation calls to wrap |
 | 4 | **Native dependencies, dark** | New binary containing the target's packages, unused. Bump the runtime version. Run the full baseline. Proves the binary before any code depends on it. | The binary already has them |
 | 5 | **Seam and flag** | Flag read, default old, kill switch, telemetry label. Any seam with a spike: the spike comes first and must pass. | No flag |
 | 6 | **First vertical slice, internal** | One low-traffic flow end to end on the new shell, with the flag on for developers only. | Hop only |
@@ -63,23 +63,25 @@ Steps 0 to 3 pay off even if the migration stops there.
 | 11 | **Internal ramp** | Staff, then beta. Fix findings. Exit: all parity rows closed, baseline green on the new shell. | Never |
 | 12 | **Staged ramp** | Percentages agreed with the owner. Abort conditions written beforehand: crash-free rate, deep link failures, a failing flow. Abort means flag off, then diagnose. With no flag, this is the store's staged rollout, and abort means halting it and shipping the rollback build. | Never |
 | 13 | **Bake** | Hold at 100% with the kill switch live for at least one release cycle. Exit: old-shell traffic is negligible, and the oldest supported binary contains the new shell. With no flag or no telemetry, hold for one release cycle and state what stands in for the measure. | Hop only |
-| 14 | **Clean exit** | Below. | Never. Hop only keeps just the scaffolding row. |
+| 14 | **Clean exit** | Below. | Never. When the owner stays, only its own rows below apply. |
 
 ### Clean exit
 
 Ships as a new binary when native dependencies change, and otherwise as whatever the change needs. Do it in one change that can be reviewed, and do not bundle unrelated work.
 
-- Delete the flag, its read, its store key, its telemetry label and its dashboards.
-- Delete the old navigators, screens' old adapters and the old `linking` config.
+- With a flag, delete the flag, its read, its store key, its telemetry label and its dashboards.
+- When the owner changes, delete the old navigators, screens' old adapters and the old `linking` config. When it stays, delete only what the plan replaced.
 - Remove what the old navigation needed:
 
   | Old navigation | Remove |
   | --- | --- |
-  | React Navigation, Wix or `react-router-native` | `@react-navigation/*`, `react-native-navigation` or `react-router-native`, and any patches for them |
+  | React Navigation moving to Router, Wix or `react-router-native` | `@react-navigation/*`, `react-native-navigation` or `react-router-native`, and any patches for them |
+  | Plain React Navigation staying | The replaced navigator's package, such as `@react-navigation/stack`. Other `@react-navigation/*` packages stay. |
+  | Adopt in place | The old screen bodies or chrome it replaced. Packages stay. |
   | @expo/ui shell | Shell components and the local modules only they use. `@expo/ui` itself stays for leaves. |
   | Hop only | Scaffolding: patches and workarounds the new SDK makes unnecessary |
 
-- Set `main` to `expo-router/entry`, or keep a side-effects-only entry that imports it last. If analysis found an entry that branches per window or scene, keep that branch, and record that it is outside the documented contract and must be re-tested each SDK.
+- When moving to Router, set `main` to `expo-router/entry`, or keep a side-effects-only entry that imports it last. If analysis found an entry that branches per window or scene, keep that branch, and record that it is outside the documented contract and must be re-tested each SDK.
 - Collapse the facade if it now only forwards to the router. Keep it if it holds real logic.
 - Keep `+native-intent` maps for old URLs for as long as they can arrive.
 - Remove test flows and config for the old shell.
@@ -87,18 +89,19 @@ Ships as a new binary when native dependencies change, and otherwise as whatever
 
 Done when:
 
-- `node <skill>/scripts/inventory-navigation.mjs <repo> --flag '<flag name>'` reports `signals.flagName.count` as 0, and the old navigation's signals pass:
+- `node <skill>/scripts/inventory-navigation.mjs <repo>` shows the old navigation's signals pass. With a flag, add `--flag '<flag name>'`, and `signals.flagName.count` must be 0. Without a flag, that clause does not apply.
 
   | Old navigation | Signals |
   | --- | --- |
-  | React Navigation | `react-navigation:import`, `:container`, `:native-stack`, `:js-stack`, `:bottom-tabs`, `:top-tabs` and `:drawer` are absent. A `create*Navigator` hit may stay only if it imports from `expo-router/*`. |
+  | React Navigation moving to Router | `react-navigation:import`, `:container`, `:native-stack`, `:js-stack`, `:bottom-tabs`, `:top-tabs` and `:drawer` are absent. A `create*Navigator` hit may stay only if it imports from `expo-router/*`. |
   | Wix | `wix-navigation` is absent |
   | `react-router-native` | `react-router-native` is absent |
   | @expo/ui shell | `expo-ui:nav-containers` and `native:swiftui-navigation` are absent, or remain only in a named self-contained flow |
-  | Hop only | No signal check: navigation keeps its owner |
+  | Plain React Navigation staying | Only the replaced navigator's signal is absent, for example `react-navigation:js-stack` |
+  | Adopt in place or hop only | No signal check: navigation keeps its owner |
 
   Leave `react-navigation:hooks`, `:imperative` and `:set-options` out of this check. They also match Router's own `useNavigation`, `useFocusEffect` and `navigation.setOptions`.
-- old packages are gone from the lockfile
+- packages the table above removes are gone from the lockfile
 - `npx expo-doctor`, typecheck, lint and the full E2E baseline pass
 - the URL table passes
 
@@ -111,5 +114,5 @@ Done when:
 - [ ] Nothing a flag cannot cover is claimed to be behind one.
 - [ ] Each undocumented or unrun approach is labelled and has a spike with pass conditions.
 - [ ] Each parity row has a status from the catalog, or `not exercised (no catalog entry)`, and no status is upgraded.
-- [ ] The final step removes the flag and the old navigation, or for hop only the scaffolding, with a checkable finish.
+- [ ] The final step removes any flag and the old navigation, or when the owner stays what the plan replaced, with a checkable finish.
 - [ ] Open questions are listed, with who can answer each.
