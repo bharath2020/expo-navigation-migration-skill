@@ -52,7 +52,7 @@ Steps 0 to 3 pay off even if the migration stops there.
 | 0 | **Baseline** | E2E flows for every parity row that has none. URL table as a test list. Record crash-free rate and start time where a reporter exists; otherwise record that and add one if the ramp needs it. Add `testID`s. | Never |
 | 1 | **SDK hops** | One release per SDK, on old navigation. [api-mapping.md](api-mapping.md). | Already on 58 |
 | 2 | **Standalone improvements** | Ship what is worth having whatever happens: serializable params, split screen files, no `null` root, native stack in place of a JS stack, safe-area fixes. | Nothing qualifies |
-| 3 | **Navigation facade** | Route names and a small API in one module: `goTo`, `back`, `canGoBack`, back guard. Move call sites over. Replace global refs. The module imports no router. When one tree runs per launch, each adapter loads only on its own branch. See the [sketch](patterns/navigation-api-layer.md#navigation-facade), which was not run and also covers two trees in one runtime. No behaviour change. | Screen seam only, hop only, or no navigation calls to wrap |
+| 3 | **Navigation facade** | Route names and a small API in one module: `goTo`, `back`, `canGoBack`, back guard. Move call sites over. Replace global refs. The module imports no router. When one tree runs per launch, each adapter loads only on its own branch. See the [sketch](patterns/navigation-api-layer.md#navigation-facade), which was not run and also covers two trees in one runtime. No behaviour change. | Screen or Navigator seam only, hop only, or no navigation calls to wrap |
 | 4 | **Native dependencies, dark** | New binary containing the target's packages, unused. Bump the runtime version. Run the full baseline. Proves the binary before any code depends on it. | The binary already has them |
 | 5 | **Seam and flag** | Flag read, default old, kill switch, telemetry label. Any seam with a spike: the spike comes first and must pass. | No flag |
 | 6 | **First vertical slice, internal** | One low-traffic flow end to end on the new shell, with the flag on for developers only. | Hop only |
@@ -75,13 +75,14 @@ Ships as a new binary when native dependencies change, and otherwise as whatever
 
   | Old navigation | Remove |
   | --- | --- |
-  | React Navigation moving to Router, Wix or `react-router-native` | `@react-navigation/*`, `react-native-navigation` or `react-router-native`, and any patches for them |
-  | Plain React Navigation staying | The replaced navigator's package, such as `@react-navigation/stack`. Other `@react-navigation/*` packages stay. |
-  | Adopt in place | The old screen bodies or chrome it replaced. Packages stay. |
-  | @expo/ui shell | Shell components and the local modules only they use. `@expo/ui` itself stays for leaves. |
+  | React Navigation being replaced, Wix or `react-router-native` | `@react-navigation/*`, `react-native-navigation` or `react-router-native`, and any patches for them |
+  | Router being replaced | The replaced routes and layouts. `expo-router` and any patches for it, unless Router stays as the host of an @expo/ui shell. |
+  | @expo/ui shell being replaced | Shell components and the local modules only they use. `@expo/ui` itself stays for leaves. |
+  | Adopt in place, replacing a navigator | The replaced navigator's package, such as `@react-navigation/stack`. Other packages stay. |
+  | Adopt in place, other changes | The old screen bodies or chrome it replaced. Packages stay. |
   | Hop only | Scaffolding: patches and workarounds the new SDK makes unnecessary |
 
-- When moving to Router, set `main` to `expo-router/entry`, or keep a side-effects-only entry that imports it last. If analysis found an entry that branches per window or scene, keep that branch, and record that it is outside the documented contract and must be re-tested each SDK.
+- When moving to Router, set `main` to `expo-router/entry`, or keep a side-effects-only entry that imports it last. If analysis found an entry that branches per window or scene, keep that branch, and record that it is outside the documented contract and must be re-tested each SDK. When dropping Router, point `main` at the new root.
 - Collapse the facade if it now only forwards to the router. Keep it if it holds real logic.
 - Keep `+native-intent` maps for old URLs for as long as they can arrive.
 - Remove test flows and config for the old shell.
@@ -93,15 +94,16 @@ Done when:
 
   | Old navigation | Signals |
   | --- | --- |
-  | React Navigation moving to Router | `react-navigation:import`, `:container`, `:native-stack`, `:js-stack`, `:bottom-tabs`, `:top-tabs` and `:drawer` are absent. A `create*Navigator` hit may stay only if it imports from `expo-router/*`. |
+  | React Navigation being replaced | `react-navigation:import`, `:container`, `:native-stack`, `:js-stack`, `:bottom-tabs`, `:top-tabs` and `:drawer` are absent. When moving to Router, a `create*Navigator` hit may stay if it imports from `expo-router/*`. |
+  | Router being replaced | `expo-router:native-tabs`, `:stack-toolbar` and `:protected` are absent. When dropping Router, `expo-router:import` and `:private-import` are absent too. |
   | Wix | `wix-navigation` is absent |
   | `react-router-native` | `react-router-native` is absent |
-  | @expo/ui shell | `expo-ui:nav-containers` and `native:swiftui-navigation` are absent, or remain only in a named self-contained flow |
-  | Plain React Navigation staying | Only the replaced navigator's signal is absent, for example `react-navigation:js-stack` |
-  | Adopt in place or hop only | No signal check: navigation keeps its owner |
+  | @expo/ui shell being replaced | `expo-ui:nav-containers` and `native:swiftui-navigation` are absent, or remain only in a named self-contained flow |
+  | Adopt in place, replacing a navigator | Only the replaced navigator's signal is absent, for example `react-navigation:js-stack` |
+  | Adopt in place, other changes, or hop only | No signal check: navigation keeps its owner |
 
   Leave `react-navigation:hooks`, `:imperative` and `:set-options` out of this check. They also match Router's own `useNavigation`, `useFocusEffect` and `navigation.setOptions`.
-- packages the table above removes are gone from the lockfile
+- packages in the `Remove` column for this plan are gone from the lockfile
 - `npx expo-doctor`, typecheck, lint and the full E2E baseline pass
 - the URL table passes
 

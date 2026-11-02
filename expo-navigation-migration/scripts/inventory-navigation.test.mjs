@@ -327,12 +327,13 @@ test('platform-specific route files classify like their plain counterparts', () 
     'app/(tabs)/index.tsx': 'export {};\n',
     'app/(tabs)/index.web.tsx': 'export {};\n',
     'app/+not-found.ios.tsx': 'export {};\n',
+    'app/hello+api.ts': 'export {};\n',
     'ios-only/app/_layout.ios.tsx': 'export {};\n',
   });
   const [tree, iosOnly] = inventory(dir).routeTrees;
   assert.equal(tree.routeCount, 1);
   assert.deepEqual(tree.layouts, ['(tabs)/_layout.ios.tsx', '(tabs)/_layout.tsx']);
-  assert.deepEqual(tree.specialFiles, ['+not-found.ios.tsx']);
+  assert.deepEqual(tree.specialFiles, ['+not-found.ios.tsx', 'hello+api.ts']);
   assert.equal(iosOnly.path, 'ios-only/app');
   assert.deepEqual(iosOnly.layouts, ['_layout.ios.tsx']);
 });

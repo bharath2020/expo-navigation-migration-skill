@@ -243,7 +243,7 @@ function appConfigFindings(root, files) {
 
 const stripExtension = (file) => file.replace(/(\.(ios|android|native|web))?\.[a-z]+$/, '');
 const isLayout = (file) => /(^|\/)_layout$/.test(stripExtension(file));
-const isSpecialRoute = (file) => /(^|\/)\+[^/]*$/.test(stripExtension(file));
+const isSpecialRoute = (file) => /(^|\/)\+[^/]*$|\+api$/.test(stripExtension(file));
 
 function routeFindings(root, files) {
   const layouts = files.filter((file) => JS_EXT.test(file) && isLayout(file.split(sep).join('/')));
