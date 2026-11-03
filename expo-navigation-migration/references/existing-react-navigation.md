@@ -171,6 +171,17 @@ Quote statuses from the status table in each file of the [pattern catalog](patte
 
 Each `not exercised` row a plan relies on adds a verification task, as [migration-planning.md](migration-planning.md) requires.
 
+## Add to the plan
+
+[The plan template](../templates/migration-plan.md) serves every archetype, so it has no scenario lines. A plan that uses this page adds:
+
+- **Scenario line**, in Recommendation, before "Why, for this repository": `**Scenario:**` existing React Navigation, with the starting point and any track. Unproven: no such migration has been run.
+- **`## URL table` section**, before section (a), with the columns URL shape, Handled by, Target route, Link kind, Sign-in needed, Tab it lands in, Where back goes, Tests, Tool that keeps it working. Write out every row of the analysis report's URL table here: a pointer to the report does not replace this table. Each native URL handler in `AppDelegate`, a scene delegate or an activity gets a row of its own, named under Handled by, even when the URLs it forwards have rows.
+- **Steps that do not apply**, in section (c): every step of this page's order that the plan skips, by its number, with the reason from the starting point.
+- **Two lines first in every step**, including conditional tracks and the final step. A statement that covers all steps does not replace them.
+  - `**Evidence:**` Unproven, then the stability word for each piece the step adopts, or "adopts nothing". The clean exit reads "Unproven. Adopts nothing."
+  - `**URL table:**` "Baseline: every row, cold and warm" on the first run; "every row, cold and warm" on each later run [Tests](#tests) names; otherwise "no run", with why. The clean exit reads "Every row, cold and warm."
+
 ## Done when
 
 The plan built from this page:

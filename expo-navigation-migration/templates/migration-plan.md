@@ -8,8 +8,6 @@ Based on analysis of <sha>. Target: Expo SDK 58.
 
 <One sentence: the target.>
 
-**Scenario:** <For archetype N or the N part of M: existing React Navigation, with the starting point and any track. Unproven: no such migration has been run. Otherwise delete this line.>
-
 Why, for this repository:
 
 1. <Finding, with evidence>
@@ -26,13 +24,6 @@ What would change this recommendation:
 
 | In use today | Target pattern | Status on target (per shipped platform) | Decision | Reason |
 | --- | --- | --- | --- | --- |
-
-## URL table
-
-For archetype N or the N part of M. Otherwise delete this section. Write out every row of the analysis report's URL table here: a pointer to the report does not replace this table. Each native URL handler in `AppDelegate`, a scene delegate or an activity gets a row of its own, named under Handled by, even when the URLs it forwards have rows.
-
-| URL shape | Handled by | Target route | Link kind | Sign-in needed | Tab it lands in | Where back goes | Tests | Tool that keeps it working |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
 ## (a) Switching behind a feature flag
 
@@ -63,16 +54,12 @@ For archetype N or the N part of M. Otherwise delete this section. Write out eve
 
 ## (c) Ordered steps
 
-Steps that do not apply: <step, and why. For archetype N or the N part of M: every step of the scenario's order that this plan skips, by its number, with the reason from the starting point.>
+Steps that do not apply: <step, and why>
 
 Steps that depend on an open question sit in a conditional track, named after the question.
 
-The **Evidence** and **URL table** lines are for archetype N or the N part of M. Otherwise delete them. Fill them on every step, including conditional tracks and the final step: a statement that covers all steps does not replace them.
-
 ### Step N: <name>
 
-- **Evidence:** Unproven. <The stability word for each piece this step adopts, or "adopts nothing">
-- **URL table:** <"Baseline: every row, cold and warm" on the first run; "every row, cold and warm" on each later run the scenario names; otherwise "no run", with why>
 - **Change:**
 - **Ships as:**
 - **User-visible:**
@@ -82,8 +69,6 @@ The **Evidence** and **URL table** lines are for archetype N or the N part of M.
 
 ### Final step: clean exit
 
-- **Evidence:** <Unproven. Adopts nothing.>
-- **URL table:** <Every row, cold and warm>
 - **Change:** <The removal list: any named flag, and the specific old packages, imports, components, files, config and tests. Nothing the target keeps.>
 - **Ships as:** <New binary when native dependencies change>
 - **User-visible:** nothing
