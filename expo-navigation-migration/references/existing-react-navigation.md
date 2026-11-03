@@ -116,7 +116,7 @@ Start from the URL table in [analysis.md](analysis.md), dimension 7. Include eac
 
 The repository cannot show URLs already out in the world: emails, sent notifications, QR codes, other apps, partner sites. Make that an open question for the owner, because those URLs decide how long the old ones must keep working.
 
-Each row of the plan's table adds: link kind (scheme or verified `https`), sign-in needed, the tab it lands in, where back goes, and the tool that keeps it working.
+Each row of the plan's **URL table** section adds: link kind (scheme or verified `https`), sign-in needed, the tab it lands in, where back goes, the [test levels](#tests) that cover it, and the tool that keeps it working.
 
 ### Tests
 

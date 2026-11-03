@@ -27,6 +27,13 @@ What would change this recommendation:
 | In use today | Target pattern | Status on target (per shipped platform) | Decision | Reason |
 | --- | --- | --- | --- | --- |
 
+## URL table
+
+For archetype N or the N part of M. Otherwise delete this section. Write out every row of the analysis report's URL table here: a pointer to the report does not replace this table.
+
+| URL shape | Handled by | Target route | Link kind | Sign-in needed | Tab it lands in | Where back goes | Tests | Tool that keeps it working |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
 ## (a) Switching behind a feature flag
 
 **Seam:** <Screen / Route / Navigator / Hosted tree / Entry; or "none fits", or "nothing to switch", with why, and the rest of this section can go>
