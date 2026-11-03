@@ -8,6 +8,8 @@ Based on analysis of <sha>. Target: Expo SDK 58.
 
 <One sentence: the target.>
 
+**Scenario:** <For archetype N or the N part of M: existing React Navigation, with the starting point and any track. Unproven: no such migration has been run. Otherwise delete this line.>
+
 Why, for this repository:
 
 1. <Finding, with evidence>

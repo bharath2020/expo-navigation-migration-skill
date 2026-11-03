@@ -38,6 +38,8 @@ Assign one. It drives the seam and the target.
 
 Several signs can fit: an app with `expo-router` and one `_layout` may still do all its real navigation in an @expo/ui shell mounted at one route. Count which code owns the screens, and classify by that. A second root outside Router, such as a per-window entry, does not make an app M: record it under dimension 6.
 
+For **N**, or the N part of **M**, also record the starting point: JS or native stack, JS or native tabs, Expo or not, per navigator. The `react-navigation:bottom-tabs` signal covers JS and native tabs alike, so [existing-react-navigation.md](existing-react-navigation.md#find-the-starting-point) says what to read. The plan follows that scenario.
+
 ### 4. Route structure
 The whole tree: navigators and nesting, or file routes and layouts. Screen count. Dynamic routes. Params: non-serializable values, nested `screen`, `params` and `initial`, which Router treats as ordinary params from SDK 58. Global navigation refs and calls from outside React.
 

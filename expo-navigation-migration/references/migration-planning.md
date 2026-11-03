@@ -7,6 +7,8 @@ Turn an analysis report into a plan for this repository. A plan with generic ste
 ### 1. Recommend a target
 Follow [target-decision.md](target-decision.md). Done when the recommendation cites findings from the report.
 
+For archetype **N**, or the N part of **M**, read [existing-react-navigation.md](existing-react-navigation.md) now. It sets the order in step 5 and adds checks to step 6.
+
 ### 2. Build the parity table
 One row per behaviour from dimensions 5 and 9 of the report.
 
@@ -106,3 +108,4 @@ Done when:
 - [ ] Each parity row has a status from the catalog, or `not exercised (no catalog entry)`, and no status is upgraded.
 - [ ] The final step names any flag and the old packages, imports, components and files it removes, with a checkable finish.
 - [ ] Open questions are listed, with who can answer each.
+- [ ] For archetype N, or the N part of M: everything under "Done when" in [existing-react-navigation.md](existing-react-navigation.md#done-when) holds.
