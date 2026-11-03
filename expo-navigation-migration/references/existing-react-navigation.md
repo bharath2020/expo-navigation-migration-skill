@@ -2,7 +2,7 @@
 
 For an app on `@react-navigation/*` that wants more native elements and a stable library for navigation and deep links: archetype **N**, or the N part of an **M** app. It adds a starting point, a stability order and a deep link track to the normal analysis and plan.
 
-**Unproven.** No migration from an existing React Navigation app has been run. The prototype was built on Expo Router from the start, so it is evidence about the destination and says nothing about the journey. Write this label on every step of a plan that uses this page, and give each step a check that can fail.
+**Unproven.** No migration from an existing React Navigation app has been run. The prototype was built on Expo Router from the start, so it is evidence about the destination and says nothing about the journey. Write this label in the **Evidence** line of every step of a plan that uses this page, and give each step a check that can fail.
 
 API facts checked on 2026-11-02 against Expo's and React Navigation's docs and the SDK 58 packages. `expo` 58.0.22 and `expo-router` 58.0.29 were the latest then, with no SDK 59 published.
 
@@ -120,7 +120,7 @@ Each row of the plan's table adds: link kind (scheme or verified `https`), sign-
 
 ### Tests
 
-Run the table on old navigation first, so later runs have a baseline to match. On track A that first run comes before step 0, and the table runs again straight after it, because adopting Expo changes native app setup. The same table then runs at steps 1, 3, 4, 5, 6 and 7, and in the clean exit. Every row passes cold and warm on each shipped platform.
+Run the table on old navigation first, so later runs have a baseline to match. On track A that first run comes before step 0, and the table runs again straight after it, because adopting Expo changes native app setup. The same table then runs at steps 1, 3, 4, 5, 6 and 7, at each SDK hop, and in the clean exit. Every run covers every row, and every row passes cold and warm on each shipped platform. A plan records this in each step's **URL table** line. On an app already on Expo, the baseline run comes before the first SDK hop, in its own step.
 
 | Level | Old navigation | Router | What it leaves unproven |
 | --- | --- | --- | --- |
@@ -177,8 +177,9 @@ Each `not exercised` row a plan relies on adds a verification task, as [migratio
 The plan built from this page:
 
 - states the starting point per navigator, with evidence
-- carries the **Unproven** label on each step, and a stability word on each piece it adopts
-- skips or keeps each step of the order, with the reason from the starting point
+- carries the **Unproven** label in each step's **Evidence** line, and a stability word there for each piece that step adopts
+- skips or keeps each step of the order by its number, with the reason from the starting point
 - names the stopping point before the first moving piece
 - has a URL table with each row's tests and old-URL tool, and an open question for URLs outside the repository
+- fills each step's **URL table** line, with the baseline run before any SDK hop or Expo adoption, and every row at each run [Tests](#tests) names
 - names track A or B when the app is not on Expo
