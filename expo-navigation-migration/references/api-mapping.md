@@ -110,7 +110,7 @@ React Native removals that hit navigation code: `InteractionManager`, the Toucha
 | API | Status at SDK 58 |
 | --- | --- |
 | `NativeTabs` from `expo-router/native-tabs` | Stable |
-| `Stack.Toolbar` | Stable per the SDK 58 changelog. The package's `@experimental` tag went away in 58.0.16. The Stack guide still labels composition components alpha, directly above a `Stack.Toolbar` sample. |
+| `Stack.Toolbar` | Moving until the [Stack guide](https://docs.expo.dev/router/advanced/stack/) drops its alpha label: pin versions and re-test at every SDK hop. The guide still labels composition components alpha, directly above a `Stack.Toolbar` sample. The [SDK 58 changelog](https://expo.dev/changelog/sdk-58) calls toolbars stable, and the package's `@experimental` tag went away in 58.0.16. |
 | `Stack.Title` | The Stack guide still says composition components are in alpha. Pin versions and re-test. |
 | `@expo/ui` SwiftUI and Compose | Declared stable in the SDK 56 post. `Host` required. Included in Expo Go. Local modules still need a development build. |
 | @expo/ui `NavigationStack`, `NavigationSplitView`, `TabView` | iOS and tvOS. |

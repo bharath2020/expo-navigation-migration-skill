@@ -82,8 +82,8 @@ The **Evidence** and **URL table** lines are for archetype N or the N part of M.
 
 ### Final step: clean exit
 
-- **Evidence:** Unproven. Adopts nothing.
-- **URL table:** every row, cold and warm
+- **Evidence:** <Unproven. Adopts nothing.>
+- **URL table:** <Every row, cold and warm>
 - **Change:** <The removal list: any named flag, and the specific old packages, imports, components, files, config and tests. Nothing the target keeps.>
 - **Ships as:** <New binary when native dependencies change>
 - **User-visible:** nothing

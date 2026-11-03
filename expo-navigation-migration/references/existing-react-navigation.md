@@ -62,13 +62,12 @@ Stability is an input to the order. Use these three words in the plan.
 | Router file routes, hrefs and `<Redirect>` | settled | [Redirects](https://docs.expo.dev/router/reference/redirects/). `expo-router` and `react-native-screens` are pinned per SDK in `bundledNativeModules.json`. |
 | `NativeTabs` from `expo-router/native-tabs` | stable at 58 | [SDK 58 changelog](https://expo.dev/changelog/sdk-58). Earlier SDKs use the `unstable-native-tabs` path. |
 | `@expo/ui` leaf controls in `Host` | stable at 58 | Declared stable in the SDK 56 post. New parts arrive per SDK. See [status](api-mapping.md#status-of-the-new-apis). |
-| `Stack.Toolbar` | moving | The [Stack guide](https://docs.expo.dev/router/advanced/stack/) still labels composition components alpha, so it stays moving until the guide drops the label. The [SDK 58 changelog](https://expo.dev/changelog/sdk-58) calls toolbars stable. See [status](api-mapping.md#status-of-the-new-apis). |
+| `Stack.Toolbar` | moving | See [status](api-mapping.md#status-of-the-new-apis). |
 | `Stack.Title`, `Stack.Header` | moving | The Stack guide's alpha label. The changelog does not name them. |
 | iPad sidebar beyond `sidebarAdaptable` | moving | Placement and icon workarounds use `unstable_nativeProps`, and custom layouts use `react-native-screens/experimental`. See [sidebar.md](patterns/sidebar.md). |
 | `+native-intent` with `redirectSystemPath` | moving | [Customizing links](https://docs.expo.dev/router/advanced/native-intent/) gives no stability word. The page labels its sibling `legacy_subscribe` alpha. |
 | `redirects` in the `expo-router` plugin | moving | Listed in the [v58 reference](https://docs.expo.dev/versions/v58.0.0/sdk/router/) in HTTP terms. No page says they apply on native. The SDK 58 source does apply them there, which was read and not run. |
 | Router's import surface | moving | Changed at SDK 56 and again at 58: [api-mapping.md](api-mapping.md#router-57-to-58-changes-that-catch-apps). The thin layer keeps screens clear of it. |
-| Plain React Navigation native tabs, 7.x | moving | [The docs](https://reactnavigation.org/docs/native-bottom-tab-navigator/): "This navigator's API may change in a minor release." |
 | React Navigation 8.x | moving | Alpha. [The upgrade guide](https://reactnavigation.org/docs/8.x/upgrading-from-7.x/) changes what `createBottomTabNavigator` means. |
 
 "Stable" here means a known set of versions and one upgrade path. It does not mean frozen: Router has breaking changes at SDK hops. That is the case for Router over plain React Navigation on this question, since Expo pins Router per SDK and pins no `@react-navigation/*` package.
@@ -153,7 +152,7 @@ Pick a track, as an open question for the owner if nobody can answer now.
 | Outcome | Switch | Adopt in place: [Navigator seam](flag-seams.md#navigator-seam), [no-flag path E](no-flag-paths.md#e-owner-stays-on-a-release-branch) |
 | Steps | All | 1, 3, 4, 5, 11's clean exit. The hops apply only with Expo. |
 | Old URLs | As above | Same path first, then [`alias`](https://reactnavigation.org/docs/configuring-links/). It is ignored when generating URLs and does not match child screens in nested navigators. |
-| Native tabs | `NativeTabs` | None: tabs stay as they are |
+| Native tabs | `NativeTabs` | Tabs stay as they are. The plan has no native tabs step, conditional or spike. |
 | `@expo/ui` | Available | Unavailable: its docs tell a React Native app to install `expo` first |
 | Committed native projects | Router's [install page](https://docs.expo.dev/router/installation/) does not say how config reaches them. Spike it. Universal Links need the [capability set by hand](https://docs.expo.dev/linking/ios-universal-links/). | No change |
 | Evidence | Unproven, from docs | `not exercised (no catalog entry)` throughout |
@@ -167,7 +166,7 @@ Quote statuses from the status table in each file of the [pattern catalog](patte
 | Piece | Status |
 | --- | --- |
 | `+native-intent`, plugin `redirects`, `<Redirect>`, `unstable_settings.anchor` | `not exercised (no catalog entry)` |
-| JS stack to native stack, native tabs on plain React Navigation, anything on plain React Navigation | `not exercised (no catalog entry)` |
+| JS stack to native stack, anything on plain React Navigation | `not exercised (no catalog entry)` |
 | Adopting Expo, or moving any existing app to Router | not run |
 
 Each `not exercised` row a plan relies on adds a verification task, as [migration-planning.md](migration-planning.md) requires.
