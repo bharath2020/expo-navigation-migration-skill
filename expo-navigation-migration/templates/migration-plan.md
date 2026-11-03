@@ -29,7 +29,7 @@ What would change this recommendation:
 
 ## URL table
 
-For archetype N or the N part of M. Otherwise delete this section. Write out every row of the analysis report's URL table here: a pointer to the report does not replace this table.
+For archetype N or the N part of M. Otherwise delete this section. Write out every row of the analysis report's URL table here: a pointer to the report does not replace this table. Each native URL handler in `AppDelegate`, a scene delegate or an activity gets a row of its own, named under Handled by, even when the URLs it forwards have rows.
 
 | URL shape | Handled by | Target route | Link kind | Sign-in needed | Tab it lands in | Where back goes | Tests | Tool that keeps it working |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
