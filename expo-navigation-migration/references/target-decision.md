@@ -28,7 +28,7 @@ Expo's own docs send routed full-screen tabs to `expo-router/native-tabs` rather
 | Archetype | Usual recommendation |
 | --- | --- |
 | **R** Expo Router | Stay on Router. Upgrade, adopt the SDK 58 chrome APIs, add @expo/ui leaves. |
-| **N** code-defined React Navigation | Router plus @expo/ui leaves. Choose plain React Navigation if a row below says so. |
+| **N** code-defined React Navigation | Router plus @expo/ui leaves. Choose plain React Navigation if a row below says so. Follow [the scenario](existing-react-navigation.md) either way. |
 | **U** @expo/ui shell | Router backbone. Keep @expo/ui screens as leaves or as a self-contained flow. Keep the shell only if a row below says so. |
 | **W** `react-native-navigation` | Router. Expo's only guidance points to a native stack, and no migration guide exists, so plan a rewrite of the navigation layer. Expect the no-flag path unless the entry seam spike passes. |
 | **X** other | Router. No official guide exists. |

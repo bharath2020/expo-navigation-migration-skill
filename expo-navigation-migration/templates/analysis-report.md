@@ -19,6 +19,7 @@ Confidence is `confirmed`, `signal` or `not found`. For `not found`, the evidenc
 | 2 | Versions: navigation packages | | | |
 | 2 | New Architecture | | | |
 | 3 | Archetype, and what owns the screens | | | |
+| 3 | Starting point, N or the N part of M: stack, tabs, Expo, per navigator | | | |
 | 4 | Route tree and screen count | | | |
 | 4 | Params and global refs | | | |
 | 5 | Shells per platform and width | | | |

@@ -1,6 +1,6 @@
 ---
 name: expo-navigation-migration
-description: Analyzes how an existing Expo or React Native repository does navigation and plans an incremental migration to Expo SDK 58 navigation, Expo Router (React Navigation and react-native-screens) and/or @expo/ui (SwiftUI, Jetpack Compose), behind a feature flag or without one, ending in a clean exit. Also a catalog of navigation patterns with verified status and known gaps - stacks, back interception, tabs, iPad sidebar and collapsible sections, modals, sheets, navbar buttons, overflow menus, large titles, bottom toolbars, Surface Duo, iPhone Duo and foldables. Use when asked to assess an app's navigation, plan a move to Expo Router, React Navigation or @expo/ui, or choose or implement any of these patterns on Expo 58.
+description: Analyzes how an existing Expo or React Native repository does navigation and plans an incremental migration to Expo SDK 58 navigation, Expo Router (React Navigation and react-native-screens) and/or @expo/ui (SwiftUI, Jetpack Compose), behind a feature flag or without one, ending in a clean exit. Also a catalog of navigation patterns with verified status and known gaps - stacks, back interception, tabs, iPad sidebar and collapsible sections, modals, sheets, navbar buttons, overflow menus, large titles, bottom toolbars, Surface Duo, iPhone Duo and foldables. Use when asked to assess an app's navigation, plan a move to Expo Router, React Navigation or @expo/ui, move an existing React Navigation app to more native elements and stable deep links (including a bare app that will not adopt Expo and stays on plain React Navigation), or choose or implement any of these patterns on Expo 58.
 ---
 
 # Expo navigation migration (SDK 58)
@@ -11,11 +11,12 @@ Three jobs. Pick by the request; a migration plan needs all three in order.
 | --- | --- |
 | "How is navigation done in this repo?" | Analyze |
 | "Plan the migration", "Can we flag this?", "React Navigation or @expo/ui?" | Analyze, then Plan |
+| "We're on React Navigation and want more native elements and a stable library for navigation and deep links" | Analyze, then Plan, with the [existing React Navigation scenario](references/existing-react-navigation.md) |
 | "How do I build a sidebar / sheet / Duo layout?", "Does X work?" | Look up in the catalog |
 
 Target names used throughout:
 
-- **React Navigation** means Expo Router on react-native-screens. `expo-router` carries its own fork of React Navigation since SDK 56.
+- **React Navigation** means Expo Router on react-native-screens. Since SDK 56 `expo-router` no longer depends on `@react-navigation/*` and forks the parts it builds on. SDK 58 removed most of that forked API.
 - **Plain React Navigation** means `@react-navigation/*` 7.x without Expo Router.
 - **@expo/ui** means SwiftUI on iOS and Jetpack Compose on Android.
 
@@ -38,6 +39,7 @@ Follow [references/migration-planning.md](references/migration-planning.md). It 
 - [references/flag-seams.md](references/flag-seams.md): where a flag can sit, what is documented, what needs a spike
 - [references/no-flag-paths.md](references/no-flag-paths.md): the switch when a flag is not possible
 - [references/api-mapping.md](references/api-mapping.md): SDK hops, import replacements, breaking changes
+- [references/existing-react-navigation.md](references/existing-react-navigation.md): the scenario for archetype N, or the N part of M: starting point, stability order, deep links
 
 Fill [templates/migration-plan.md](templates/migration-plan.md). The plan always covers the flagged switch, the no-flag switch, ordered steps that each ship and verify alone, and a clean exit that removes any flag and what the plan replaced. It names one recommendation with reasons from this repository. That recommendation can be to keep the current owner of navigation; when only the SDK moves, the plan says there is nothing to flag, and why.
 

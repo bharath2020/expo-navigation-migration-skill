@@ -22,7 +22,7 @@ Cover all of them, in this order. In a monorepo, repeat 2 to 9 for each app the 
 Package manager, workspaces, which packages are apps, shared navigation packages. Project rules in `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md` that constrain a migration.
 
 ### 2. Versions
-Resolved versions of `expo`, `react-native`, `react`, `expo-router`, `@react-navigation/*`, `react-native-screens`, `@expo/ui`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-safe-area-context`. For SDK 54 or earlier, whether the New Architecture is on: it is mandatory from SDK 55. If an app has `react-native` and no `expo`, record that: its plan starts by adopting Expo.
+Resolved versions of `expo`, `react-native`, `react`, `expo-router`, `@react-navigation/*`, `react-native-screens`, `@expo/ui`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-safe-area-context`. For SDK 54 or earlier, whether the New Architecture is on: it is mandatory from SDK 55. If an app has `react-native` and no `expo`, record that: its plan starts by adopting Expo, unless it stays on plain React Navigation ([track B](existing-react-navigation.md#not-on-expo)).
 
 ### 3. Archetype
 Assign one. It drives the seam and the target.
@@ -37,6 +37,8 @@ Assign one. It drives the seam and the target.
 | **M**: mixed | More than one above. Name each part and which screens it owns. |
 
 Several signs can fit: an app with `expo-router` and one `_layout` may still do all its real navigation in an @expo/ui shell mounted at one route. Count which code owns the screens, and classify by that. A second root outside Router, such as a per-window entry, does not make an app M: record it under dimension 6.
+
+For **N**, or the N part of **M**, also record the starting point: JS or native stack, JS or native tabs, Expo or not, per navigator. The `react-navigation:bottom-tabs` signal covers JS and native tabs alike, so [existing-react-navigation.md](existing-react-navigation.md#find-the-starting-point) says what to read. The plan follows that scenario.
 
 ### 4. Route structure
 The whole tree: navigators and nesting, or file routes and layouts. Screen count. Dynamic routes. Params: non-serializable values, nested `screen`, `params` and `initial`, which Router treats as ordinary params from SDK 58. Global navigation refs and calls from outside React.
