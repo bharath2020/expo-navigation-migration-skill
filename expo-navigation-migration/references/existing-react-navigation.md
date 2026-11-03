@@ -61,8 +61,8 @@ Stability is an input to the order. Use these three words in the plan.
 | Plain React Navigation 7.x and its `linking` config | settled | [Configuring links](https://reactnavigation.org/docs/configuring-links/). No page names SDK 58, and `expo/bundledNativeModules.json` pins no `@react-navigation/*` package. |
 | Router file routes, hrefs and `<Redirect>` | settled | [Redirects](https://docs.expo.dev/router/reference/redirects/). `expo-router` and `react-native-screens` are pinned per SDK in `bundledNativeModules.json`. |
 | `NativeTabs` from `expo-router/native-tabs` | stable at 58 | [SDK 58 changelog](https://expo.dev/changelog/sdk-58). Earlier SDKs use the `unstable-native-tabs` path. |
-| `Stack.Toolbar` | stable at 58 | The changelog calls toolbars stable. The [Stack guide](https://docs.expo.dev/router/advanced/stack/) still labels composition components alpha. See [status](api-mapping.md#status-of-the-new-apis). |
 | `@expo/ui` leaf controls in `Host` | stable at 58 | Declared stable in the SDK 56 post. New parts arrive per SDK. See [status](api-mapping.md#status-of-the-new-apis). |
+| `Stack.Toolbar` | moving | The [Stack guide](https://docs.expo.dev/router/advanced/stack/) still labels composition components alpha, so it stays moving until the guide drops the label. The [SDK 58 changelog](https://expo.dev/changelog/sdk-58) calls toolbars stable. See [status](api-mapping.md#status-of-the-new-apis). |
 | `Stack.Title`, `Stack.Header` | moving | The Stack guide's alpha label. The changelog does not name them. |
 | iPad sidebar beyond `sidebarAdaptable` | moving | Placement and icon workarounds use `unstable_nativeProps`, and custom layouts use `react-native-screens/experimental`. See [sidebar.md](patterns/sidebar.md). |
 | `+native-intent` with `redirectSystemPath` | moving | [Customizing links](https://docs.expo.dev/router/advanced/native-intent/) gives no stability word. The page labels its sibling `legacy_subscribe` alpha. |
@@ -78,7 +78,7 @@ Order rules:
 1. Settled pieces go first, and each ships alone.
 2. A piece waits for what it sits on: tabs after stacks, sidebar after tabs, toolbars after the stack they sit in.
 3. Stable-at-58 pieces come after the hop to 58.
-4. A moving piece gets its own step with pinned versions, and a re-test at every later SDK hop.
+4. A moving piece gets its own step with pinned versions, and a re-test at every later SDK hop. The exception is a URL tool that old URLs need from the release Router goes live: it ships in step 6, with the same pin and re-test.
 5. The plan names a stopping point before the first moving piece, so the app keeps its gains if the team stops there. In the order below that is the first stopping point.
 
 ## Order of steps
@@ -93,12 +93,12 @@ Each row names a rung of [the ladder](migration-planning.md#the-ladder), which h
 | 3 | Standalone improvements that do not touch the stack, such as serializable params and split screen files | 2 | settled | Nothing qualifies |
 | 4 | Native stack in place of the JS stack. Keep route names identical, using the [Navigator seam](flag-seams.md#navigator-seam). | 2 | settled | Already on it |
 | 5 | Deep link suite, complete and automated. See below. | 0, 8 | settled | The app accepts no URLs |
-| | **Stopping point: native stack and tested URLs, with settled pieces only** | | | |
-| 6 | Router, with old URLs kept working. Native dependencies ship dark first. | 4 to 8 | settled, plus any moving URL tool it needs | Track B |
-| 7 | Native tabs. See [tabs.md](patterns/tabs.md). | 9 | stable at 58 | No tabs |
-| | **Stopping point: Router and native tabs. What follows is optional chrome and controls.** | | | |
-| 8 | iPad sidebar. See [sidebar.md](patterns/sidebar.md). | 9 | moving | No iPad layout |
-| 9 | Header toolbars in place of `headerRight`. See [navbar-buttons.md](patterns/navbar-buttons.md). On Android this needs `@expo/ui` and `expo-symbols`, so include them in step 6's binary. | 9 | stable at 58, moving for `Stack.Title` | No buttons set from screens |
+| | **Stopping point: native stack and tested URLs, with settled pieces only. Step 11 still runs, scoped to what the plan replaced.** | | | |
+| 6 | Router, with old URLs kept working. Native dependencies ship dark first. | 4 to 8 | settled, plus any moving URL tool it needs, under order rule 4's exception | Track B |
+| 7 | Native tabs. See [tabs.md](patterns/tabs.md). | 9 | stable at 58 | No tabs, or track B |
+| | **Stopping point: Router and native tabs. Steps 8 to 10 are optional chrome and controls. Step 11 still runs, scoped to what the plan replaced.** | | | |
+| 8 | iPad sidebar. See [sidebar.md](patterns/sidebar.md). | 9 | moving | No iPad layout, or track B |
+| 9 | Header toolbars in place of `headerRight`. See [navbar-buttons.md](patterns/navbar-buttons.md). On Android this needs `@expo/ui` and `expo-symbols`, so include them in step 6's binary. | 9 | moving | No buttons set from screens, or track B |
 | 10 | `@expo/ui` screen by screen. See [mixed-content.md](patterns/mixed-content.md). | 10 | stable at 58 | Not recommended |
 | 11 | Ramp, bake, then remove old code | 11 to 14 | | Never |
 
@@ -120,7 +120,7 @@ Each row of the plan's table adds: link kind (scheme or verified `https`), sign-
 
 ### Tests
 
-Run the table on old navigation first, so the new run has a baseline to match. The same table runs at steps 1, 4, 5, 6 and 7, and in the clean exit. Every row passes cold and warm on each shipped platform.
+Run the table on old navigation first, so later runs have a baseline to match. On track A that first run comes before step 0, and the table runs again straight after it, because adopting Expo changes native app setup. The same table then runs at steps 1, 3, 4, 5, 6 and 7, and in the clean exit. Every row passes cold and warm on each shipped platform.
 
 | Level | Old navigation | Router | What it leaves unproven |
 | --- | --- | --- | --- |
@@ -141,7 +141,7 @@ Prefer the top of this list. The tools are described in [api-mapping.md](api-map
 5. **`redirects` in the plugin**, once a device run on each platform proves it, since no page says it applies on native.
 6. **`+not-found`**, for what is left: link home, and log the URL so unknown old links show up.
 
-A custom `subscribe` or `getInitialURL` that feeds notifications needs a new home. `legacy_subscribe` in `+native-intent` is labelled alpha, so it is a moving piece with its own step.
+A custom `subscribe` or `getInitialURL` that feeds notifications needs a new home. `legacy_subscribe` in `+native-intent` is labelled alpha, so it is a moving piece under order rule 4.
 
 ## Not on Expo
 
@@ -153,7 +153,7 @@ Pick a track, as an open question for the owner if nobody can answer now.
 | Outcome | Switch | Adopt in place: [Navigator seam](flag-seams.md#navigator-seam), [no-flag path E](no-flag-paths.md#e-owner-stays-on-a-release-branch) |
 | Steps | All | 1, 3, 4, 5, 11's clean exit. The hops apply only with Expo. |
 | Old URLs | As above | Same path first, then [`alias`](https://reactnavigation.org/docs/configuring-links/). It is ignored when generating URLs and does not match child screens in nested navigators. |
-| Native tabs | `NativeTabs` | 7.x `/unstable` entry, which is moving, or wait for 8.x to leave pre-release |
+| Native tabs | `NativeTabs` | None: tabs stay as they are |
 | `@expo/ui` | Available | Unavailable: its docs tell a React Native app to install `expo` first |
 | Committed native projects | Router's [install page](https://docs.expo.dev/router/installation/) does not say how config reaches them. Spike it. Universal Links need the [capability set by hand](https://docs.expo.dev/linking/ios-universal-links/). | No change |
 | Evidence | Unproven, from docs | `not exercised (no catalog entry)` throughout |
@@ -162,19 +162,11 @@ An app already on Expo can also take track B when [target-decision.md](target-de
 
 ## What the prototype supports
 
-Quote these as written. **Verified** means on a simulator or emulator. See [verification.md](patterns/verification.md).
+Quote statuses from the status table in each file of the [pattern catalog](pattern-catalog.md). [verification.md](patterns/verification.md) defines the words and covers deep links. These pieces have no catalog entry:
 
 | Piece | Status |
 | --- | --- |
-| Native stack through Router: push, pop, pop to root | verified on iOS and Android |
-| `NativeTabs` with badges | verified on iOS and Android |
-| Each tab keeping its own stack, re-tap to root | not exercised |
-| iPad sidebar with `sidebarAdaptable` | verified. Sidebar sections are a gap. |
-| `Stack.Toolbar` buttons | verified, with disabling a bar button not exercised |
-| `@expo/ui` body in a Router screen | verified to render on iOS and Android, with some behaviours not exercised on Android |
-| Deep links | partial on iOS: one iPad open and `typedRoutes` compile checks. Not exercised on Android. |
-| `+native-intent`, plugin `redirects`, `<Redirect>`, `unstable_settings.anchor` | not exercised: the prototype has none |
-| Navigation facade | not exercised: a sketch |
+| `+native-intent`, plugin `redirects`, `<Redirect>`, `unstable_settings.anchor` | `not exercised (no catalog entry)` |
 | JS stack to native stack, native tabs on plain React Navigation, anything on plain React Navigation | `not exercised (no catalog entry)` |
 | Adopting Expo, or moving any existing app to Router | not run |
 
