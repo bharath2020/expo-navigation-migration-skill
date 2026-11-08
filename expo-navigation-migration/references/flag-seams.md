@@ -4,7 +4,7 @@ A **seam** is the place where a flag chooses old or new navigation. The seam dec
 
 ## What a flag cannot cover
 
-- **Adopting Expo.** An app without `expo` adds it in a new binary, before any flag.
+- **Adopting Expo.** An app moving to `expo` adds it in a new binary, before any flag.
 - **The SDK upgrade.** "Update the Expo SDK version" is on Expo's list of what requires a new binary. Ship each SDK hop on the old navigation, before any flag.
 - **Native dependencies.** `expo-router`, `@expo/ui` and `react-native-screens` all ship native code. They reach users in a new binary with a new runtime version. A flag can only turn on what a shipped binary already contains.
 - **A running session.** Evaluate once per process and keep the value until the next launch. Nothing here tests a flip mid-session, and in the prototype remounting a navigator reset its state.
