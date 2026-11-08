@@ -19,7 +19,7 @@ Why, from building every feature twice:
 | iOS | Native for every feature tested, except sidebar sections, which are a gap with no tested path | No full-screen cover, no interception of the back button or swipe |
 | Android | Everything except large titles and page or form sheets with a header | No stack, back handling, push animation, cascading menus or large app bar; the prototype wrote those in JavaScript |
 | URLs, deep links, typed routes | Built into Router. In the prototype: one iPad deep-link open and `typedRoutes` compile checks; no Android deep-link run. Test the app's URL table. | State only |
-| Custom native code in the prototype | None | Sidebar sections and sidebar placement, each a local module |
+| Custom native code in the prototype | None, except hiding the navbar on Android (a local module) | Sidebar sections, sidebar placement and hiding the navbar, each a local module |
 
 Expo's own docs send routed full-screen tabs to `expo-router/native-tabs` rather than the SwiftUI `TabView`, and document no way to use @expo/ui as a router or to connect its `NavigationStack` to URLs.
 
