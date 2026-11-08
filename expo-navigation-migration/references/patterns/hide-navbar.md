@@ -4,14 +4,14 @@ Hiding and showing the real native top navigation bar from a button and from scr
 ## Status
 | | React Navigation iOS | React Navigation Android | @expo/ui iOS (SwiftUI) | @expo/ui Android (Compose) |
 | --- | --- | --- | --- | --- |
-| Hide and show from a button | verified, `headerShown` | verified, `AppBarLayout.setExpanded` (local module) | verified, `navigationBarHidden` (local module) | verified, `AnimatedVisibility` |
-| Scroll down hides, scroll up or top shows | verified, `ScrollView` `onScroll` | verified, `ScrollView` `onScroll` | verified, `useScrollGeometryChange` | verified, `nestedScrollOffset` (local module) |
-| Content moves with the bar, no jump or gap | verified | verified, 56 dp | verified, after the UIKit-driven fix | verified, 64 dp |
+| Hide and show from a button | verified, `headerShown` | partial: verified, needs local module, `AppBarLayout.setExpanded` | partial: verified, needs local module, `navigationBarHidden` | verified, `AnimatedVisibility` |
+| Scroll down hides, scroll up or top shows | verified, `ScrollView` `onScroll` | partial: verified, needs local module, `ScrollView` `onScroll` | partial: verified, needs local module, `useScrollGeometryChange` | partial: verified, needs local module, `nestedScrollOffset` |
+| Content moves with the bar, no jump or gap | verified | partial: verified, needs local module, 56 dp | partial: verified, needs local module, after the UIKit-driven fix | verified, 64 dp |
 | Back while the bar is hidden | verified, edge swipe | verified, back gesture and key | partial, swipe-back re-checked on iPhone only | verified, `BackHandler` |
 | Leave the screen and come back with the bar shown | not exercised | verified | not exercised | verified |
 | iPad, top tab bar and sidebar | partial, top tabs cover the first rows | n/a | partial, top tabs cover the first rows | n/a |
 
-Every `verified` cell ran on a simulator or emulator. Only React Navigation on iOS needs no native code; the other three use a local module and a development build.
+Every `verified` and `partial: verified` cell ran on a simulator or emulator. Only React Navigation on iOS needs no native code; the other three use a local module and a development build.
 
 ## Unified API
 One platform-neutral hook owns whether the bar is hidden and turns real scroll offsets into hide and show. There are no timers and no header drawn in JavaScript. Each shell applies `hidden` to its own native bar and feeds `reportScroll` from its own scroll events.
@@ -250,6 +250,7 @@ return (
 - No shell makes the bar follow the finger. The hook toggles the whole bar once the travel threshold is crossed, and the bar animates in or out. For Compose the source records this as a gap: @expo/ui's `TopAppBar` takes no `scrollBehavior`, so Material 3's `enterAlwaysScrollBehavior` is not available. A finger-tracking bar was not built for the other shells.
 - iPad, both shells: the top tab bar is not part of the navigation bar, so it stays when the bar hides and floats over the first rows.
 - Android has no large title, so there is nothing to collapse before the bar hides.
+- React Navigation Android, hiding the bar from a scroll within about the bar's height of the end of the list was not exercised. The collapse scroll flags make the screen taller by the bar's range, so the `ScrollView` may clamp its offset and the bar could come straight back. Check it in the app.
 
 ## Verification
 iOS ran on iPhone 17 Pro and iPad Pro 13-inch (M5) simulators on the iOS 27.0 runtime, with the iPad in both the top tab bar and the sidebar. Maestro drove the tap, the scroll in both directions, back at the top and swipe-back while hidden, with recordings. Android ran on a Pixel emulator (API 35) in both shells. Screenshots were taken but are not published with this skill.
