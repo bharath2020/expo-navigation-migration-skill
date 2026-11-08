@@ -1,0 +1,43 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:${kotlinVersion}")
+  }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'expo-module-gradle-plugin'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+
+group = 'expo.modules.appbarvisibility'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.appbarvisibility"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+  buildFeatures {
+    compose true
+  }
+}
+
+// @expo/ui ships prebuilt from its local Maven repository unless it is built from source.
+def expoUiProject = findProject(':expo-ui')
+def expoUiVersion = new groovy.json.JsonSlurper()
+  .parse(file("${projectDir}/../../../node_modules/@expo/ui/package.json"))
+  .version
+
+dependencies {
+  implementation 'com.facebook.react:react-android'
+  if (expoUiProject != null) {
+    implementation expoUiProject
+  } else {
+    implementation "expo.modules.ui:expo.modules.ui:${expoUiVersion}"
+  }
+  implementation 'androidx.compose.ui:ui-android:1.12.1'
+  implementation 'com.google.android.material:material:1.13.0'
+}

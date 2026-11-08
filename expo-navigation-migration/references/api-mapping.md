@@ -61,6 +61,7 @@ The official guide assumes a full conversion. Its preparation steps can each shi
 | Custom navigator | `createStandardRouterNavigator` or `integrateWithRouter`; `withLayoutContext` still works and is deprecated. |
 | `beforeRemove` | `usePreventRemove`. `beforeRemove` is gone at SDK 58. |
 | `headerRight` in `setOptions` | `Stack.Toolbar`: [patterns/navbar-buttons.md](patterns/navbar-buttons.md) |
+| `headerShown` toggled from state, or a JS header hidden on scroll | `useNavigationBarVisibility` and `useStackNavigationBar`: [patterns/hide-navbar.md](patterns/hide-navbar.md). Android needs a local module |
 | Nested `screen`, `params`, `initial` | Complete hrefs |
 | `initialRouteName` | `unstable_settings.anchor`. The launch URL picks the launch screen. |
 

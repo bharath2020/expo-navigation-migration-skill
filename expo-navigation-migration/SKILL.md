@@ -1,6 +1,6 @@
 ---
 name: expo-navigation-migration
-description: Analyzes how an existing Expo or React Native repository does navigation and plans an incremental migration to Expo SDK 58 navigation, Expo Router (React Navigation and react-native-screens) and/or @expo/ui (SwiftUI, Jetpack Compose), behind a feature flag or without one, ending in a clean exit. Also a catalog of navigation patterns with verified status and known gaps - stacks, back interception, tabs, iPad sidebar and collapsible sections, modals, sheets, navbar buttons, overflow menus, large titles, bottom toolbars, Surface Duo, iPhone Duo and foldables. Use when asked to assess an app's navigation, plan a move to Expo Router, React Navigation or @expo/ui, or choose or implement any of these patterns on Expo 58.
+description: Analyzes how an existing Expo or React Native repository does navigation and plans an incremental migration to Expo SDK 58 navigation, Expo Router (React Navigation and react-native-screens) and/or @expo/ui (SwiftUI, Jetpack Compose), behind a feature flag or without one, ending in a clean exit. Also a catalog of navigation patterns with verified status and known gaps - stacks, back interception, tabs, iPad sidebar and collapsible sections, modals, sheets, navbar buttons, overflow menus, large titles, hiding the navbar on tap and scroll, bottom toolbars, Surface Duo, iPhone Duo and foldables. Use when asked to assess an app's navigation, plan a move to Expo Router, React Navigation or @expo/ui, or choose or implement any of these patterns on Expo 58.
 ---
 
 # Expo navigation migration (SDK 58)
@@ -45,4 +45,4 @@ Fill [templates/migration-plan.md](templates/migration-plan.md). The plan always
 
 [references/pattern-catalog.md](references/pattern-catalog.md) lists every scenario and its file. Each file gives code from a working prototype for both targets on iOS and Android, status per platform, gotchas and migration notes. Quote status words as written: **verified** means exercised on a simulator or emulator, and no physical hardware was used.
 
-[templates/](templates/) holds the reusable files: the local modules for sidebar sections and sidebar placement, the navigation helper layer, and the hinge and pane-split components. Local modules need a development build.
+[templates/](templates/) holds the reusable files: the local modules for sidebar sections, sidebar placement and navbar visibility, the navigation helper layer, and the hinge and pane-split components. Local modules need a development build.

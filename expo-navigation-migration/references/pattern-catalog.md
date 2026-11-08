@@ -18,6 +18,7 @@ Read [patterns/verification.md](patterns/verification.md) for what status words 
 | Overflow menu: checkmarks, sections, submenus | [overflow-menu.md](patterns/overflow-menu.md) | Menus in the navbar |
 | Live titles, large titles | [titles.md](patterns/titles.md) | Title changes and Android's limit |
 | Bottom toolbar | [bottom-toolbar.md](patterns/bottom-toolbar.md) | The iOS 26 tab bar overlap and its fix |
+| Hide the navbar on a tap and on scroll | [hide-navbar.md](patterns/hide-navbar.md) | One hook for every shell, replacing `headerShown` toggles and JS hide-on-scroll headers; two local modules |
 | React Navigation chrome around a SwiftUI or Compose body | [mixed-content.md](patterns/mixed-content.md) | The recommended mix, and what was observed |
 | Two shells in one app | [shell-coexistence.md](patterns/shell-coexistence.md) | Mounting @expo/ui as one route; the base of the route seam |
 | Thin TypeScript layer between screens and router | [navigation-api-layer.md](patterns/navigation-api-layer.md) | Tab config, presentation helpers, navbar store, navigation facade sketch, Android navigation summary, testing guidance |
@@ -44,4 +45,8 @@ Multiple windows, search-role tabs and system search are covered for SDK 57 in t
 | `templates/modules/tab-bar-placement/` | `defaultTabBarPlacement` for @expo/ui `TabView` (Swift). Needs a development build. |
 | `templates/src/navigation/config.ts`, `presentation.ts`, `stack-options.ts`, `use-toolbar-icons.ts`, `navbar-store.ts` | Navigation helper layer. `config.ts` requires `assets/images/tab-colored.png`: supply an image or remove `coloredTabIcon`. |
 | `templates/src/navigation/use-hinge.ts`, `use-pane-layout.ts`, `templates/src/components/pane-split*.tsx`, `flex-pane-split.tsx` | Hinge geometry and two-pane layout |
+| `templates/modules/swiftui-navigation-bar/` | `navigationBarHidden` for @expo/ui SwiftUI screens in a `NavigationStack` (Swift). Needs a development build. |
+| `templates/modules/app-bar-visibility/` | Collapses the React Navigation Android header (`setStackAppBarHidden`) and reports Compose scroll offsets (`nestedScrollOffset`) (Kotlin). Needs a development build. |
+| `templates/src/navigation/navigation-bar-visibility.ts`, `use-stack-navigation-bar.ts`, `use-stack-navigation-bar.android.ts` | The navbar visibility hook and its React Navigation wrappers |
+| `templates/src/examples/hide-bar/` | Hide bar screens for React Navigation, SwiftUI and Compose (with a minimal Compose shell) |
 | `templates/src/theme.ts` | The palette the pane components import as `@/theme`. Replace it with the app's theme. |

@@ -26,6 +26,10 @@ Status is `fixed` (code changed, problem gone), `workaround` (code avoids the li
 | Turning the large title back on stays collapsed until pull-down | SwiftUI | Normal UIKit behaviour per the verification notes | None needed | accepted gap |
 | `Stack.Toolbar.Button` has no `testID`, and iOS nav bar items are not in the accessibility tree simulator tools read | RN | Not in the API | Target `accessibilityLabel` | workaround |
 | Inline title hides when the nav bar is crowded with buttons | RN, SwiftUI | iOS behaviour | None | accepted gap |
+| Hiding the nav bar jumps the `List` by the bar's height in one frame | SwiftUI | @expo/ui has no toolbar visibility modifier, and SwiftUI's `toolbarVisibility(.hidden, for: .navigationBar)` applies the new safe area outside the bar's animation | Local module `modules/swiftui-navigation-bar` drives the `UINavigationController` inside a UIKit animation. See [hide-navbar.md](hide-navbar.md) | fixed |
+| No swipe-back while the nav bar is hidden | SwiftUI | UIKit's delegate for the swipe-back recognizers refuses touches while the bar is hidden | The same module takes over the delegate while hidden, with react-native-screens' rules. Re-checked on iPhone only | fixed |
+| The nav bar does not hide | RN | A `Stack.Toolbar` forces `headerShown: true` over the screen's options | Declare header items only while the bar shows | workaround |
+| With the nav bar hidden, the iPad top tab bar covers the first rows | RN, SwiftUI | The top tab bar is not part of the navigation bar | None | accepted gap |
 | A sheet sometimes does not open when tapped right after another sheet closes | shell not named in the source | Unknown | None recorded | accepted gap |
 
 ## iOS: iPhone Duo
@@ -70,6 +74,8 @@ Status is `fixed` (code changed, problem gone), `workaround` (code avoids the li
 | Checkbox-style menu items (the source records only the fix) | Compose | Unknown | Trailing checkmark | fixed |
 | Bottom `Stack.Toolbar` inside a `ScrollView` drew behind rows | RN | Toolbar was inside the list | Render it outside the scroll view | fixed |
 | Keyboard covers a focused Compose text field | RN + Compose body | Screen neither resizes nor scrolls the field into view | None. See [mixed-content.md](mixed-content.md) | accepted gap |
+| `headerShown: false` jumps the content instead of sliding the bar | RN | It removes the toolbar and lays the screen out again in one frame; no option collapses the app bar | Local module `modules/app-bar-visibility` collapses the `AppBarLayout` with `setExpanded`. See [hide-navbar.md](hide-navbar.md) | workaround |
+| No scroll events from `LazyColumn`, and `TopAppBar` takes no `scrollBehavior` | Compose | @expo/ui registers `LazyColumn` without view events | The same module's `nestedScrollOffset` modifier on a parent `Box`; the whole bar hides and shows rather than following the finger | workaround |
 | Predictive back is off | RN, Compose | `android.predictiveBackGestureEnabled: false` in `app.json`; interaction with `usePreventRemove` not verified | Leave it off until verified | accepted gap |
 
 ## Android: foldable, tablet and Surface Duo

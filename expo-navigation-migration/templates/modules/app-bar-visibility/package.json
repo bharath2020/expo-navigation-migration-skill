@@ -1,0 +1,7 @@
+{
+  "name": "app-bar-visibility",
+  "version": "1.0.0",
+  "description": "Hides the Android top app bar: the native stack's AppBarLayout and Compose scroll events",
+  "main": "index.ts",
+  "private": true
+}
