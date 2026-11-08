@@ -1,0 +1,7 @@
+{
+  "name": "swiftui-navigation-bar",
+  "version": "1.0.0",
+  "description": "SwiftUI navigation bar visibility as an @expo/ui modifier",
+  "main": "index.ts",
+  "private": true
+}

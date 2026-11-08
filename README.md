@@ -66,7 +66,7 @@ expo-navigation-migration/
 - An agent that can read files and run Node 18 or later.
 - The target repository can be on any SDK. Plans take apps below SDK 58 through one SDK at a time. A React Native app without Expo adopts Expo first, or stays on the React Navigation native stack with a hand-written deep link config.
 - Using the patterns needs Expo SDK 58. The prototype ran `expo` 58.0.19, `expo-router` 58.0.26, `@expo/ui` 58.0.23, React Native 0.88 and `react-native-screens` 4.30.
-- The sidebar section and placement modules need a development build.
+- The local modules in templates/modules/ need a development build.
 
 ## Install
 

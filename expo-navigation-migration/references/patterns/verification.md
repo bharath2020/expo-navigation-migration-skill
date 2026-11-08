@@ -114,6 +114,7 @@ Rows are the comparison's difference table. Its legend maps as: native to `verif
 | Live title | verified | verified | verified | verified |
 | Large title | verified: `headerLargeTitleEnabled` | gap | verified: display mode | gap: small app bar only |
 | Bottom toolbar | verified: hide tab bar on iPhone | verified: floating toolbar | partial: iPad only | verified: floating toolbar |
+| Hide navbar on tap and scroll | verified: `headerShown` | partial: local module, `AppBarLayout.setExpanded` | partial: local `navigationBarHidden` modifier drives UIKit | partial: `AnimatedVisibility` + local `nestedScrollOffset`, no `scrollBehavior` |
 | URLs, deep links, typed routes | partial: see notes | not exercised: see notes | gap: state only | gap: state only |
 
 One row from the verification notes is outside that table:
@@ -130,6 +131,7 @@ Notes on the matrix:
 - **Overflow menu, @expo/ui Android.** The comparison marks it native. A section shows as dividers with no title, the same reduction marked partial for React Navigation Android.
 - **URLs, deep links, typed routes, React Navigation.** The comparison marks it native on both platforms. The recorded runs are one iPad deep-link open and `typedRoutes` compile checks. No Android deep-link run is recorded.
 - **Rows from the comparison only.** Block sheet dismissal, Coloured tab icon, iPhone Duo sidebar (open) and Sidebar sections have no row in the feature-by-shell notes. Their status rests on the comparison, reduced as noted above for Block sheet dismissal.
+- **Hide navbar on tap and scroll.** From the comparison's section 16. Its iOS runs were on the iPhone 17 Pro and iPad Pro 13-inch (M5) simulators on the iOS 27.0 runtime, and Android on a Pixel emulator (API 35), both shells. @expo/ui swipe-back while hidden was re-checked after its fix on iPhone only. See [hide-navbar.md](hide-navbar.md).
 - **Modal, React Navigation Android.** All presentation styles fall back to the full-screen modal with its own app bar and a push inside.
 - **Back, @expo/ui Android.** `BackHandler` pops, shows the discard alert, moves another tab to the Stack tab, and leaves the shell from the root.
 - **Back, React Navigation Android.** System back from a root tab exits the app.
@@ -183,4 +185,5 @@ Pixel 9 Pro Fold regression check: dual panes still split at the fold, `Hinge: n
 - A TalkBack or VoiceOver pass. `accessibilityLabel` was used as a test handle, with no screen reader result recorded.
 - State restoration. The comparison credits the native containers with it, with no run recorded.
 - Unit tests for the navigation helpers. The prototype has none.
+- Hiding the navbar on iPhone Duo, in landscape, while rotating, inside a modal or sheet stack, or on Android tablets and foldables. See [hide-navbar.md](hide-navbar.md).
 - The web fallback in `src/expo-ui/shell.tsx`.
