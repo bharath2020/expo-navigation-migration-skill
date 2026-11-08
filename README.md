@@ -15,6 +15,8 @@ It also carries a catalog of navigation patterns, each built both ways in a prot
 - **The switch when a flag is not possible**: how to replace what a flag gives you, including the weak point, rollback.
 - **Ordered incremental steps**, each shippable and verifiable alone, ending in a clean exit that removes any flag and what the plan replaced, with a checkable finish.
 
+**Has a named scenario for an app already on React Navigation** that wants more native elements and a stable library for navigation and deep links. It separates the settled pieces from those that change between Expo versions, and treats deep links as their own track: inventory, tests, and old URLs kept working.
+
 **Answers pattern questions** from the catalog, with code from the prototype, status per platform and known gaps.
 
 The skill plans. It does not change your application code unless you separately ask for that.
@@ -52,6 +54,7 @@ expo-navigation-migration/
     flag-seams.md          Where a flag can sit, and what is proven
     no-flag-paths.md       Switching without a flag
     api-mapping.md         SDK hops, import replacements, breaking changes
+    existing-react-navigation.md  Scenario for an app already on React Navigation
     pattern-catalog.md     Index of every scenario
     patterns/              One file per scenario, plus gaps and verification
   scripts/                 Read-only navigation inventory (Node, no dependencies)
@@ -61,11 +64,19 @@ expo-navigation-migration/
 ## Requirements
 
 - An agent that can read files and run Node 18 or later.
-- The target repository can be on any SDK. Plans take apps below SDK 58 through one SDK at a time. A React Native app without Expo adopts Expo first.
+- The target repository can be on any SDK. Plans take apps below SDK 58 through one SDK at a time. A React Native app without Expo adopts Expo first, or stays on the React Navigation native stack with a hand-written deep link config.
 - Using the patterns needs Expo SDK 58. The prototype ran `expo` 58.0.19, `expo-router` 58.0.26, `@expo/ui` 58.0.23, React Native 0.88 and `react-native-screens` 4.30.
 - The local modules in templates/modules/ need a development build.
 
 ## Install
+
+### npx
+
+Uses the third-party [`skills`](https://www.npmjs.com/package/skills) installer:
+
+```sh
+npx skills add bharath2020/expo-navigation-migration-skill -g -a claude-code -y
+```
 
 ### Claude Code
 
@@ -90,6 +101,7 @@ Copy `expo-navigation-migration/` wherever your agent loads skills from, or poin
 Analyze this repository's navigation and plan a migration to Expo 58.
 Can we move to Expo Router behind a feature flag?
 Should we use React Navigation or @expo/ui here?
+We're on React Navigation. How do we move to more native elements and a stable library for navigation and deep links?
 How do I build a collapsible iPad sidebar on Expo 58?
 What are our options for Surface Duo?
 ```
@@ -98,7 +110,7 @@ What are our options for Surface Duo?
 
 - API facts were checked against Expo's docs and the SDK 58 packages on 2026-11-02. Expo changes every SDK, so the skill tells the agent to re-check versioned docs.
 - The prototype has no feature flag, so no seam ran with a flag driving it. Choosing old or new navigation in a custom entry point is not documented by Expo, and hosting a legacy tree under Router rests on a narrow carve-out for embedded trees. Neither was run at all. The skill labels these and requires a spike.
-- Nothing here was run on plain React Navigation without Expo Router.
+- Nothing here was run on plain React Navigation without Expo Router, and no migration from an existing React Navigation app has been run. That scenario's plans carry an unproven label on every step.
 - Adopting Expo in a React Native app without it follows Expo's docs and was not run here. The plan labels that step as unproven and requires a spike.
 - There is no official migration guide for `react-native-navigation` or `react-router-native`.
 

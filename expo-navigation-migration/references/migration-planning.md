@@ -7,6 +7,8 @@ Turn an analysis report into a plan for this repository. A plan with generic ste
 ### 1. Recommend a target
 Follow [target-decision.md](target-decision.md). Done when the recommendation cites findings from the report.
 
+For archetype **N**, or the N part of **M**, read [existing-react-navigation.md](existing-react-navigation.md) now. It sets the order in step 5 and adds checks to step 6.
+
 ### 2. Build the parity table
 One row per behaviour from dimensions 5 and 9 of the report.
 
@@ -48,7 +50,7 @@ Steps 0 to 3 pay off even if the migration stops there.
 
 | # | Step | Notes | Skip when |
 | --- | --- | --- | --- |
-| A | **Adopt Expo** | The first step for an app with `react-native` and no `expo`, which the inventory shows as `isExpoApp: false` with no `expo` under `navigation`. Follow Expo's [guide for existing React Native apps](https://docs.expo.dev/bare/overview/): [install Expo modules](https://docs.expo.dev/bare/installing-expo-modules/) with `npx install-expo-modules@latest`, or by hand if the project differs significantly from a default React Native project, then [use Expo CLI](https://docs.expo.dev/bare/using-expo-cli/). Navigation does not change, and this ships as a new binary. The install page does not say which SDK you get, so read the installed `expo` version, and start step 1 from it. **Unproven: from Expo's docs, not run here.** Label it in the plan. Spike on a branch, which passes when a release build starts on each shipped platform with navigation unchanged. | `expo` is already a dependency |
+| A | **Adopt Expo** | The first step for an app with `react-native` and no `expo`, which the inventory shows as `isExpoApp: false` with no `expo` under `navigation`. Follow Expo's [guide for existing React Native apps](https://docs.expo.dev/bare/overview/): [install Expo modules](https://docs.expo.dev/bare/installing-expo-modules/) with `npx install-expo-modules@latest`, or by hand if the project differs significantly from a default React Native project, then [use Expo CLI](https://docs.expo.dev/bare/using-expo-cli/). Navigation does not change, and this ships as a new binary. The install page does not say which SDK you get, so read the installed `expo` version, and start step 1 from it. **Unproven: from Expo's docs, not run here.** Label it in the plan. Spike on a branch, which passes when a release build starts on each shipped platform with navigation unchanged. | `expo` is already a dependency, or the app stays on plain React Navigation ([track B](existing-react-navigation.md#not-on-expo)) |
 | 0 | **Baseline** | E2E flows for every parity row that has none. URL table as a test list. Record crash-free rate and start time where a reporter exists; otherwise record that and add one if the ramp needs it. Add `testID`s. | Never |
 | 1 | **SDK hops** | One release per SDK, on old navigation. [api-mapping.md](api-mapping.md). | Already on 58 |
 | 2 | **Standalone improvements** | Ship what is worth having whatever happens: serializable params, split screen files, no `null` root, native stack in place of a JS stack, safe-area fixes. | Nothing qualifies |
@@ -106,3 +108,4 @@ Done when:
 - [ ] Each parity row has a status from the catalog, or `not exercised (no catalog entry)`, and no status is upgraded.
 - [ ] The final step names any flag and the old packages, imports, components and files it removes, with a checkable finish.
 - [ ] Open questions are listed, with who can answer each.
+- [ ] For archetype N, or the N part of M: everything under "Done when" in [existing-react-navigation.md](existing-react-navigation.md#done-when) holds.

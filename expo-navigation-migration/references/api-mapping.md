@@ -74,7 +74,7 @@ No official guide exists for `react-native-navigation` or `react-router-native`,
 | Tool | Use |
 | --- | --- |
 | `+native-intent` with `redirectSystemPath` | Primary native tool. Runs on cold start and while running. Native only, and has no app state such as auth. |
-| `redirects` in the `expo-router` plugin | Declarative pattern maps |
+| `redirects` in the `expo-router` plugin | Arrays of static rules with `source` and `destination`. No page says they apply on native; the SDK 58 source does, which was read and not run. Prove it with a device run. |
 | `<Redirect>` in a stub route file | One old path per file. Replaces the removed `redirect` prop on layout screens. |
 | `usePathname` and `Redirect` in a layout | Rewrites that need app state |
 | `+not-found` | Fallback only. Link home. |
@@ -111,7 +111,7 @@ React Native removals that hit navigation code: `InteractionManager`, the Toucha
 | API | Status at SDK 58 |
 | --- | --- |
 | `NativeTabs` from `expo-router/native-tabs` | Stable |
-| `Stack.Toolbar` | Stable from 58.0.16 |
+| `Stack.Toolbar` | Moving until the [Stack guide](https://docs.expo.dev/router/advanced/stack/) drops its alpha label: pin versions and re-test at every SDK hop. The guide still labels composition components alpha, directly above a `Stack.Toolbar` sample. The [SDK 58 changelog](https://expo.dev/changelog/sdk-58) calls toolbars stable, and the package's `@experimental` tag went away in 58.0.16. |
 | `Stack.Title` | The Stack guide still says composition components are in alpha. Pin versions and re-test. |
 | `@expo/ui` SwiftUI and Compose | Declared stable in the SDK 56 post. `Host` required. Included in Expo Go. Local modules still need a development build. |
 | @expo/ui `NavigationStack`, `NavigationSplitView`, `TabView` | iOS and tvOS. |
