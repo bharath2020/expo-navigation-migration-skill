@@ -96,7 +96,7 @@ Each row names a rung of [the ladder](migration-planning.md#the-ladder), which h
 | 6 | Router, with old URLs kept working. Native dependencies ship dark first. | 4 to 8 | settled, plus any moving URL tool it needs, under order rule 4's exception | Track B |
 | 7 | Native tabs. See [tabs.md](patterns/tabs.md). | 9 | stable at 58 | No tabs, or track B |
 | | **Stopping point: Router and native tabs. Steps 8 to 10 are optional chrome and controls. Step 11 still runs, scoped to what the plan replaced.** | | | |
-| 8 | iPad sidebar. See [sidebar.md](patterns/sidebar.md). | 9 | moving | No iPad layout, or track B |
+| 8 | iPad sidebar. See [sidebar.md](patterns/sidebar.md). | 9 | moving | No iPad or open-Duo layout |
 | 9 | Header toolbars in place of `headerRight`. See [navbar-buttons.md](patterns/navbar-buttons.md). On Android this needs `@expo/ui` and `expo-symbols`, so include them in step 6's binary. | 9 | moving | No buttons set from screens, or track B |
 | 10 | `@expo/ui` screen by screen. See [mixed-content.md](patterns/mixed-content.md). | 10 | stable at 58 | Not recommended |
 | 11 | Ramp, bake, then remove old code | 11 to 14 | | Never |
@@ -150,16 +150,16 @@ Pick a track, as an open question for the owner if nobody can answer now.
 | --- | --- | --- |
 | Means | Step 0, then the whole order | Native stack and a hand-written `linking` config |
 | Outcome | Switch | Adopt in place: [Navigator seam](flag-seams.md#navigator-seam), [no-flag path E](no-flag-paths.md#e-owner-stays-on-a-release-branch) |
-| Steps | All | 1, 3, 4, 5, 11's clean exit. The hops apply only with Expo. |
+| Steps | All | 1, 3, 4, 5, 8 only with an iPad or open-Duo layout, 11's clean exit. The hops apply only with Expo. |
 | Old URLs | As above | Same path first, then [`alias`](https://reactnavigation.org/docs/configuring-links/). It is ignored when generating URLs and does not match child screens in nested navigators. |
-| Native tabs | `NativeTabs` | Tabs stay as they are. The plan has no native tabs step, conditional or spike. |
+| Native tabs | `NativeTabs` | Tabs stay as they are, except one conditional step 8, only when the app has an iPad or open-Duo layout: `createNativeBottomTabNavigator` from `@react-navigation/bottom-tabs/unstable` (7.x) with `tabBarControllerMode: 'tabSidebar'` and `tabBarSidebarPreferredPlacement: 'sidebar'`. See [React Navigation without Expo Router](patterns/sidebar.md#react-navigation-without-expo-router). |
 | `@expo/ui` | Available | Unavailable: its docs tell a React Native app to install `expo` first |
 | Committed native projects | Router's [install page](https://docs.expo.dev/router/installation/) does not say how config reaches them. Spike it. Universal Links need the [capability set by hand](https://docs.expo.dev/linking/ios-universal-links/). | No change |
-| Evidence | Unproven, from docs | `not exercised (no catalog entry)` throughout |
+| Evidence | Unproven, from docs | `not exercised (no catalog entry)` throughout, except step 8's sidebar: verified on simulators in an Expo app using React Navigation without Expo Router (the prototype's comparison, section 17); not exercised in a non-Expo app |
 
 An app already on Expo can also take track B when [target-decision.md](target-decision.md#what-changes-the-recommendation) says so, for example a custom `getStateFromPath` that shared routes cannot replace. It still takes SDK hops. `@expo/ui` declares no router peer, but no page says `Host` works under plain React Navigation, so spike it before relying on it.
 
-An app that keeps React Navigation without adopting Expo Router can still have the iPad and open-iPhone-Duo sidebar: `createNativeBottomTabNavigator` from `@react-navigation/bottom-tabs/unstable` with two screen options, and no native code. See [React Navigation without Expo Router](patterns/sidebar.md#react-navigation-without-expo-router). It was verified inside an Expo app; its `/unstable` entry makes it a moving piece.
+An app that keeps React Navigation without adopting Expo Router can still have the iPad and open-iPhone-Duo sidebar: `createNativeBottomTabNavigator` from `@react-navigation/bottom-tabs/unstable` with two screen options, and no native code. See [React Navigation without Expo Router](patterns/sidebar.md#react-navigation-without-expo-router). On track B this is the conditional step 8, only when the app has an iPad or open-Duo layout. It was verified on simulators inside an Expo app and not exercised in a non-Expo app; its `/unstable` entry makes it a moving piece.
 
 ## What the prototype supports
 
@@ -168,7 +168,7 @@ Quote statuses from the status table in each file of the [pattern catalog](patte
 | Piece | Status |
 | --- | --- |
 | `+native-intent`, plugin `redirects`, `<Redirect>`, `unstable_settings.anchor` | `not exercised (no catalog entry)` |
-| JS stack to native stack, anything on plain React Navigation other than the [sidebar](patterns/sidebar.md#react-navigation-without-expo-router) | `not exercised (no catalog entry)` |
+| JS stack to native stack, anything on plain React Navigation other than the [sidebar](patterns/sidebar.md#react-navigation-without-expo-router) inside an Expo app | `not exercised (no catalog entry)` |
 | Adopting Expo, or moving any existing app to Router | not run |
 
 Each `not exercised` row a plan relies on adds a verification task, as [migration-planning.md](migration-planning.md) requires.
