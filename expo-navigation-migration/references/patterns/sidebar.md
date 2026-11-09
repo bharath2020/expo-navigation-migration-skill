@@ -4,25 +4,28 @@ One tab list that shows as a sidebar and top tab bar on iPad, a sidebar on an op
 ## Status
 Versions: `expo` 58.0.19, `expo-router` 58.0.26, `react-native-screens` 4.30.0, `@expo/ui` 58.0.23. "verified" means exercised on a simulator or emulator; no physical hardware was used. iPhone Duo runs used the iOS 27.1 simulator with Xcode 27.1 Device Hub and a Release build.
 
-| | React Navigation iOS | React Navigation Android | @expo/ui iOS (SwiftUI) | @expo/ui Android (Compose) |
-| --- | --- | --- | --- | --- |
-| iPad: sidebar expanded, collapses to top tab bar | verified: `sidebarAdaptable` | n/a: no navigation rail | verified: `tabViewStyle` modifier | n/a: no navigation rail |
-| iPad: open in the sidebar by default | gap: iPadOS ignores placement | n/a | gap: iPadOS ignores placement | n/a |
-| Open iPhone Duo, landscape: sidebar plus content | verified: `preferredPlacement` | n/a | partial: verified, needs local module | n/a |
-| Open iPhone Duo, portrait: sidebar behind navbar button | verified: opens over content | n/a | verified: tabs flat, see Gotchas | n/a |
-| Open iPhone Duo: floating top tab bar | gap: iPad idiom only | n/a | gap: iPad idiom only | n/a |
-| Folded iPhone Duo: tab bar in the rail | verified | n/a | verified: tabs flat | n/a |
-| Standard iPhone: bottom tab bar, unchanged | verified | n/a | verified: tabs flat | n/a |
-| Collapsible sidebar sections | gap: flat triggers only | n/a | partial: verified, needs local module | n/a |
-| Sections on the iPad top tab bar | n/a: no sections | n/a | partial: `tab-sections` template, one item per section | n/a |
-| Wide Android window (tablet, unfolded foldable) | n/a | gap: bottom bar only | n/a | gap: no `NavigationRail`, `TabRow` |
-| Colored tab icon in the sidebar | verified: iPad | n/a | verified: iPhone Duo | n/a |
+The "React Navigation without Expo Router" column is a separate shell in the same Expo app: `@react-navigation/native` 7.5.1, `@react-navigation/native-stack` 7.21.0 and `@react-navigation/bottom-tabs` 7.21.0 on the same `react-native-screens` 4.30.0. It ran as a Debug build on the iPhone Duo simulator (iOS 27.1, Xcode 27.1 Device Hub) and an iPad simulator (iPadOS 26.3.1). Its Android side was only built (`./gradlew :app:assembleDebug`); its behaviour there was not checked. See [React Navigation without Expo Router](#react-navigation-without-expo-router).
+
+| | React Navigation iOS | React Navigation without Expo Router iOS | React Navigation Android | @expo/ui iOS (SwiftUI) | @expo/ui Android (Compose) |
+| --- | --- | --- | --- | --- | --- |
+| iPad: sidebar expanded, collapses to top tab bar | verified: `sidebarAdaptable` | verified: `tabBarControllerMode` | n/a: no navigation rail | verified: `tabViewStyle` modifier | n/a: no navigation rail |
+| iPad: open in the sidebar by default | gap: iPadOS ignores placement | gap: iPadOS ignores placement | n/a | gap: iPadOS ignores placement | n/a |
+| Open iPhone Duo, landscape: sidebar plus content | verified: `preferredPlacement` | verified: both options | n/a | partial: verified, needs local module | n/a |
+| Open iPhone Duo, portrait: sidebar behind navbar button | verified: opens over content | verified: opens over content | n/a | verified: tabs flat, see Gotchas | n/a |
+| Open iPhone Duo: floating top tab bar | gap: iPad idiom only | gap: iPad idiom only, same `UITabBarController` | n/a | gap: iPad idiom only | n/a |
+| Folded iPhone Duo: tab bar in the rail | verified | verified: selected tab kept | n/a | verified: tabs flat | n/a |
+| Standard iPhone: bottom tab bar, unchanged | verified | not exercised | n/a | verified: tabs flat | n/a |
+| Collapsible sidebar sections | gap: flat triggers only | gap: flat tabs, same `Tabs.Host` | n/a | partial: verified, needs local module | n/a |
+| Sections on the iPad top tab bar | n/a: no sections | n/a: no sections | n/a | partial: `tab-sections` template, one item per section | n/a |
+| Wide Android window (tablet, unfolded foldable) | n/a | n/a | gap: bottom bar only | n/a | gap: no `NavigationRail`, `TabRow` |
+| Colored tab icon in the sidebar | verified: iPad | verified: `tinted: false` | n/a | verified: iPhone Duo | n/a |
 
 ## Options
 | Option | Device | What you get | Cost |
 | --- | --- | --- | --- |
 | `NativeTabs` `sidebarAdaptable` | iPad | Top tab bar with a sidebar button; the same tabs expand into a sidebar. No effect on iPhone or Android | One prop |
 | `NativeTabs` `preferredPlacement="sidebar"` | Open iPhone Duo | Sidebar on the open display. Folded Duo and other iPhones keep the tab bar. iPadOS ignores it | One prop |
+| `createNativeBottomTabNavigator` with `tabBarControllerMode: 'tabSidebar'` and `tabBarSidebarPreferredPlacement: 'sidebar'` | iPad, open iPhone Duo | The same sidebar, top tab bar and rail as `NativeTabs`, from React Navigation 7 with no Expo Router navigator | Two screen options and an `/unstable` import. No native code |
 | `tabViewStyle({ type: 'sidebarAdaptable' })` | iPad | The same UIKit sidebar and top tab bar, in a SwiftUI `TabView` | One @expo/ui modifier |
 | `defaultTabBarPlacement('sidebar')` from `templates/modules/tab-bar-placement/` | Open iPhone Duo | SwiftUI's counterpart of `preferredPlacement` (iOS 27) | Local module and a development build |
 | `SectionedTabView` from `templates/modules/tab-sections/` | iPad, open iPhone Duo in landscape | Sidebar headings that collapse and expand; tabs flat in a tab bar | Local module and a development build |
@@ -30,7 +33,7 @@ Versions: `expo` 58.0.19, `expo-router` 58.0.26, `react-native-screens` 4.30.0, 
 | Patch `RNSTabBarController` to use `UITabGroup` | iPad, iPhone Duo | Sections in the React Navigation shell | Patching react-native-screens' native code. Not built |
 | Bottom bar | Android, any width | `BottomNavigationView` or `NavigationBar`. Neither framework offers a rail or top tabs here | None |
 
-Pick React Navigation unless the user needs collapsible sidebar sections. Sections are the one sidebar feature only the @expo/ui shell has.
+Pick React Navigation unless the user needs collapsible sidebar sections. Sections are the one sidebar feature only the @expo/ui shell has. An app that keeps React Navigation without Expo Router gets the same sidebar from two screen options: see [React Navigation without Expo Router](#react-navigation-without-expo-router).
 
 ## React Navigation (Expo Router + react-native-screens)
 iPad: the tabs render as the floating tab bar at the top, with a sidebar button at its leading edge. The button expands the same tabs into a sidebar (icons, titles and badges carry over) and collapses it back. In portrait the sidebar overlays the content; in landscape it opens beside it. No per-screen code is needed.
@@ -57,6 +60,69 @@ From the prototype: `src/app/(tabs)/_layout.tsx`
 Sections: not available. `NativeTabs` takes a flat list of triggers, and `RNSTabBarController` in react-native-screens 4.30 makes one `UITab` per screen and never a `UITabGroup`, UIKit's sidebar section. There is also no `.sidebarOnly` placement, so the sidebar lists the same tabs as the top bar. Rows that exist only in the sidebar need a native module: see Sections outside the top bar.
 
 Safe area: the open sidebar is a leading safe-area inset. Native headers and scroll views follow it. A custom horizontal layout must follow it too, with `SafeAreaView` from `react-native-screens/experimental`. See `references/patterns/dual-screen.md` for the code and the double-inset bug.
+
+## React Navigation without Expo Router
+The open-Duo and iPad sidebar works with React Navigation and react-native-screens alone, from stable npm packages and with no native code. `@react-navigation/bottom-tabs` 7.21.0 exports `createNativeBottomTabNavigator` from its `/unstable` entry. That navigator renders react-native-screens' public `Tabs.Host`, the same `UITabBarController` host that `NativeTabs` renders. Two iOS screen options are the counterparts of the `NativeTabs` props:
+
+| Expo Router `NativeTabs` | React Navigation 7 option | react-native-screens `Tabs.Host` | UIKit |
+| --- | --- | --- | --- |
+| `sidebarAdaptable` | `tabBarControllerMode: 'tabSidebar'` | `ios.tabBarControllerMode` | `UITabBarController.mode` (iOS 18+) |
+| `preferredPlacement="sidebar"` | `tabBarSidebarPreferredPlacement: 'sidebar'` | `ios.tabBarSidebarPreferredPlacement` | `UITabBarController.sidebar.preferredPlacement` (iOS 27+) |
+
+Both options are required. Expo Router turns on `tabSidebar` mode from `preferredPlacement` alone; React Navigation passes each option as given, and the placement does nothing outside `tabSidebar` mode. Set them in `screenOptions`, not on one screen: the navigator reads them from the focused tab's screen, so every tab must carry the same mode.
+
+From the prototype: `src/rn-screens/shell.tsx`
+```tsx
+import { createNativeBottomTabNavigator } from '@react-navigation/bottom-tabs/unstable';
+// ...
+<Tab.Navigator
+  screenOptions={{
+    headerShown: false,
+    tabBarControllerMode: 'tabSidebar',
+    tabBarSidebarPreferredPlacement: 'sidebar',
+    tabBarMinimizeBehavior: 'onScrollDown',
+  }}>
+  {tabs.map((tab) => (
+    <Tab.Screen
+      key={tab.name}
+      name={tab.name}
+      component={TabStack}
+      // ...
+      options={{
+        title: tab.title,
+        tabBarIcon:
+          tab.name === 'navbar'
+            ? { type: 'image', source: coloredTabIcon, tinted: false }
+            : ({ focused }) => ({ type: 'sfSymbol', name: sfSymbol(tab.icon, focused) }),
+      }}
+    />
+  ))}
+</Tab.Navigator>
+```
+
+The shell has its own `NavigationContainer`, a root native stack (the tabs plus a modal) and a native stack per tab. `tinted: false` is the counterpart of `renderingMode="original"` for a full-color tab icon.
+
+**Versions.** `@react-navigation/native` 7.5.1, `@react-navigation/native-stack` 7.21.0, `@react-navigation/bottom-tabs` 7.21.0 and `@react-navigation/elements` 2.9.45, installed with `npx expo install`, on `react-native-screens` 4.30.0. Expo Router 58.0.26 does not use these packages; it ships its own copy of React Navigation in `expo-router/build/react-navigation`. `8.0.0-alpha.57` has the same options but needs `@react-navigation/native` 8 (alpha).
+
+**Where the props go**, read from the installed sources and not patched: `NativeBottomTabView.native.tsx` in `@react-navigation/bottom-tabs/src/unstable/` maps `'auto'` to `'automatic'` and passes both options to `<Tabs.Host ios={{ tabBarControllerMode, tabBarSidebarPreferredPlacement, ... }}>`. `RNSTabsHostComponentView.mm` in react-native-screens sets `_controller.mode` (iOS 18+) and `_controller.sidebar.preferredPlacement` (iOS 27+). The only unstable part is the JavaScript entry point; the native props are public react-native-screens API.
+
+**Verified**, on the same native result as the Expo Router shell (same controller, mode and placement):
+
+| Check | Result |
+| --- | --- |
+| Duo open, landscape | Sidebar beside the content. Selecting a sidebar row switches tabs |
+| Duo open, upright | Sidebar collapsed into a navigation-bar button. The button opens the sidebar over the content, and tapping outside closes it |
+| Duo folded | Tab bar in the trailing rail. The selected tab survives folding and unfolding |
+| iPad | Top tab bar with a sidebar button, and the sidebar opens from it |
+| Android | `./gradlew :app:assembleDebug` builds. Behaviour not checked |
+
+Screenshots of each check beside the Expo Router shell are in the prototype's comparison, section 17; they are not published with this skill.
+
+**Caveats.**
+- **No deep links.** The shell is plain navigation state: no file routes, typed links or URL linking until a `linking` config is added.
+- **Two copies of React Navigation** when this runs inside an Expo Router app: Router's built-in copy and 7.x are both in the bundle. Their contexts are separate, so a nested `NavigationContainer` does not clash, and Router's `router` still controls the outer app.
+- **Warning before iOS 27.** react-native-screens logs `tabBarSidebarPreferredPlacement is supported for iOS >= 27`. `NativeTabs` passes the same prop and gets the same warning, and iPadOS ignores the placement anyway.
+- **Unstable entry.** `createNativeBottomTabNavigator` is exported only from the `/unstable` entry point of `@react-navigation/bottom-tabs` 7.x, so its API can change in a minor release. Pin the exact version, with no `^` or `~`. The package itself and the react-native-screens props it drives are stable; only the `/unstable` entry point can change. Expo Router `NativeTabs`, stable at SDK 58, is the stable route.
 
 ## @expo/ui
 ### iOS (SwiftUI)
@@ -198,7 +264,7 @@ From the prototype: `src/expo-ui/shell.android.tsx`
 ## Gotchas
 - **Back button, bar buttons and sidebar button do nothing on an open, upright iPhone Duo (@expo/ui shell with sections).** The list below still works. Cause: in a portrait window on the phone idiom, iOS 27.1 puts the navigation bar inside the top safe-area inset, beside the sidebar button. SwiftUI hosts a `TabSection`'s tabs in one more hosting view, and that view takes every touch in the inset as its own. A flat list of tabs has no such view. Fix: `SectionedTabView` drops the sections while a phone is portrait and brings them back in landscape, already in the template. Pushed screens and the selected tab survive the switch. The React Navigation shell and the iPad are not affected.
 - **Regression check for that bug.** With the Duo open and upright (window 669 × 951 pt), hit-test points in the navigation bar from lldb with `hitTest:withEvent:`. The bug is present when the innermost view at a point is a hosting view whose class name includes `TabItem` and `RootView`. Passing means each point lands on a bar button.
-- **Rail on the open Duo instead of a sidebar.** Both shells showed it before the placement was set. It is the iOS default on a phone. Set `preferredPlacement` or `defaultTabBarPlacement`.
+- **Rail on the open Duo instead of a sidebar.** Both shells showed it before the placement was set. It is the iOS default on a phone. Set `preferredPlacement` or `defaultTabBarPlacement`, or, without Expo Router, both `tabBarControllerMode` and `tabBarSidebarPreferredPlacement`.
 - **No top tab bar on the Duo.** With the sidebar hidden, a phone shows a sidebar button in the navbar and nothing else. UIKit draws the top tab bar only for the iPad idiom. Setting `traitOverrides.userInterfaceIdiom = .pad` on the tab bar controller, in a throwaway test, did not bring it. Design for the sidebar button.
 - **The iPad cannot be told to open in the sidebar.** `preferredPlacement` has no effect where both placements exist (iPadOS), and the app opens in the top tab bar. Older notes name `tabBarSidebarPreferredPlacement` through `unstable_nativeProps`; `preferredPlacement` is what the prototype uses and it writes that same option.
 - **Tabs in a section become unreachable from the iPad top bar (`tab-sections` template).** With the sidebar hidden, the top bar shows one item per section (Navigation, Toolbars), not the three tabs. Choosing Navigation opens its first tab, Stack. Present can then be reached only through the sidebar. If every tab must be one tap away in the top bar, keep the tabs flat. This limit is the template's, not one of sections in general: see Sections outside the top bar.
@@ -212,6 +278,7 @@ From the prototype: `src/expo-ui/shell.android.tsx`
 
 ## Migration notes
 - JS drawer or custom sidebar: replace with `NativeTabs` `sidebarAdaptable`. iOS then moves the tabs between sidebar, top bar and rail.
+- App that keeps React Navigation without Expo Router: use `createNativeBottomTabNavigator` with both screen options in `screenOptions`. See [React Navigation without Expo Router](#react-navigation-without-expo-router).
 - Custom tab bar or JS header: Expo's iPhone Duo guide advises against them, since JS bars do not follow the rail. Move to `NativeTabs` and `Stack`.
 - Custom native sidebar with groups: use `SectionedTabView` if the shell can be @expo/ui on iOS. Otherwise flatten the groups or keep a native module, since `NativeTabs` has no sections.
 - Existing sectioned module: compare before replacing it. It may do what `SectionedTabView` does not, such as flat tabs beside sections, or sections kept out of the top bar.

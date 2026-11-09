@@ -33,7 +33,7 @@ The prototype has no code or evidence for these. In a plan, mark them `not exerc
 - Search-role tabs and `.searchable`
 - Multiple windows, scene delegates, dragging a row out to a new window, and a splash per root
 - Drawers and top tabs
-- Plain React Navigation without Expo Router
+- Plain React Navigation without Expo Router, except the iPad and open-Duo sidebar, verified inside an Expo app (see [React Navigation without Expo Router](patterns/sidebar.md#react-navigation-without-expo-router))
 
 Multiple windows, search-role tabs and system search are covered for SDK 57 in the separate [expo-ipad-navigation](https://github.com/bharath2020/expo-ipad-navigation-skill) skill. Its evidence is not carried over to SDK 58.
 
