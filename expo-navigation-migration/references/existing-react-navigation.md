@@ -159,6 +159,8 @@ Pick a track, as an open question for the owner if nobody can answer now.
 
 An app already on Expo can also take track B when [target-decision.md](target-decision.md#what-changes-the-recommendation) says so, for example a custom `getStateFromPath` that shared routes cannot replace. It still takes SDK hops. `@expo/ui` declares no router peer, but no page says `Host` works under plain React Navigation, so spike it before relying on it.
 
+An app that keeps React Navigation without adopting Expo Router can still have the iPad and open-iPhone-Duo sidebar: `createNativeBottomTabNavigator` from `@react-navigation/bottom-tabs/unstable` with two screen options, and no native code. See [React Navigation without Expo Router](patterns/sidebar.md#react-navigation-without-expo-router). It was verified inside an Expo app; its `/unstable` entry makes it a moving piece.
+
 ## What the prototype supports
 
 Quote statuses from the status table in each file of the [pattern catalog](pattern-catalog.md). [verification.md](patterns/verification.md) defines the words and covers deep links. These pieces have no catalog entry:
@@ -166,7 +168,7 @@ Quote statuses from the status table in each file of the [pattern catalog](patte
 | Piece | Status |
 | --- | --- |
 | `+native-intent`, plugin `redirects`, `<Redirect>`, `unstable_settings.anchor` | `not exercised (no catalog entry)` |
-| JS stack to native stack, anything on plain React Navigation | `not exercised (no catalog entry)` |
+| JS stack to native stack, anything on plain React Navigation other than the [sidebar](patterns/sidebar.md#react-navigation-without-expo-router) | `not exercised (no catalog entry)` |
 | Adopting Expo, or moving any existing app to Router | not run |
 
 Each `not exercised` row a plan relies on adds a verification task, as [migration-planning.md](migration-planning.md) requires.
