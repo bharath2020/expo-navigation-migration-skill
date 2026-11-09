@@ -110,7 +110,7 @@ What are our options for Surface Duo?
 
 - API facts were checked against Expo's docs and the SDK 58 packages on 2026-11-02. Expo changes every SDK, so the skill tells the agent to re-check versioned docs.
 - The prototype has no feature flag, so no seam ran with a flag driving it. Choosing old or new navigation in a custom entry point is not documented by Expo, and hosting a legacy tree under Router rests on a narrow carve-out for embedded trees. Neither was run at all. The skill labels these and requires a spike.
-- Nothing here was run on plain React Navigation without Expo Router, and no migration from an existing React Navigation app has been run. That scenario's plans carry an unproven label on every step.
+- Nothing here was run on plain React Navigation without Expo Router except the iPad and open-Duo sidebar, verified inside an Expo app (see [React Navigation without Expo Router](expo-navigation-migration/references/patterns/sidebar.md#react-navigation-without-expo-router)), and no migration from an existing React Navigation app has been run. That scenario's plans carry an unproven label on every other step.
 - Adopting Expo in a React Native app without it follows Expo's docs and was not run here. The plan labels that step as unproven and requires a spike.
 - There is no official migration guide for `react-native-navigation` or `react-router-native`.
 
