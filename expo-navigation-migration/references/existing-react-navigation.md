@@ -119,7 +119,7 @@ Each row of the plan's **URL table** section adds: link kind (scheme or verified
 
 ### Tests
 
-Run the table on old navigation first, so later runs have a baseline to match. On track A that first run comes before step 0, and the table runs again straight after it, because adopting Expo changes native app setup. The same table then runs at steps 1, 3, 4, 5, 6 and 7, at each SDK hop, and in the clean exit. Every run covers every row, and every row passes cold and warm on each shipped platform. A plan records this in each step's **URL table** line. On an app already on Expo, the baseline run comes before the first SDK hop, in its own step.
+Run the table on old navigation first, so later runs have a baseline to match. On track A that first run comes before step 0, and the table runs again straight after it, because adopting Expo changes native app setup. The same table then runs at steps 1, 3, 4, 5, 6 and 7, at track B's step 8, at each SDK hop, and in the clean exit. Every run covers every row, and every row passes cold and warm on each shipped platform. A plan records this in each step's **URL table** line. On an app already on Expo, the baseline run comes before the first SDK hop, in its own step.
 
 | Level | Old navigation | Router | What it leaves unproven |
 | --- | --- | --- | --- |
@@ -155,7 +155,7 @@ Pick a track, as an open question for the owner if nobody can answer now.
 | Native tabs | `NativeTabs` | Tabs stay as they are, except one conditional step 8, only when the app has an iPad or open-Duo layout: `createNativeBottomTabNavigator` from `@react-navigation/bottom-tabs/unstable` (7.x) with `tabBarControllerMode: 'tabSidebar'` and `tabBarSidebarPreferredPlacement: 'sidebar'`. See [React Navigation without Expo Router](patterns/sidebar.md#react-navigation-without-expo-router). |
 | `@expo/ui` | Available | Unavailable: its docs tell a React Native app to install `expo` first |
 | Committed native projects | Router's [install page](https://docs.expo.dev/router/installation/) does not say how config reaches them. Spike it. Universal Links need the [capability set by hand](https://docs.expo.dev/linking/ios-universal-links/). | No change |
-| Evidence | Unproven, from docs | `not exercised (no catalog entry)` throughout, except step 8's sidebar: verified on simulators in an Expo app using React Navigation without Expo Router (the prototype's comparison, section 17); not exercised in a non-Expo app |
+| Evidence | Unproven, from docs | `not exercised (no catalog entry)` throughout, except step 8's sidebar: verified on iPhone Duo and iPad simulators in an Expo app using React Navigation without Expo Router (the prototype's comparison, section 17); standard iPhone not exercised; Android build only; not exercised in a non-Expo app. Step 8 swaps the tab navigator on every platform, so the standard iPhone and Android tab bars each need their own verification task. |
 
 An app already on Expo can also take track B when [target-decision.md](target-decision.md#what-changes-the-recommendation) says so, for example a custom `getStateFromPath` that shared routes cannot replace. It still takes SDK hops. `@expo/ui` declares no router peer, but no page says `Host` works under plain React Navigation, so spike it before relying on it.
 

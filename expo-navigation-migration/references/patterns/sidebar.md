@@ -122,7 +122,7 @@ Screenshots of each check beside the Expo Router shell are in the prototype's co
 - **No deep links.** The shell is plain navigation state: no file routes, typed links or URL linking until a `linking` config is added.
 - **Two copies of React Navigation** when this runs inside an Expo Router app: Router's built-in copy and 7.x are both in the bundle. Their contexts are separate, so a nested `NavigationContainer` does not clash, and Router's `router` still controls the outer app.
 - **Warning before iOS 27.** react-native-screens logs `tabBarSidebarPreferredPlacement is supported for iOS >= 27`. `NativeTabs` passes the same prop and gets the same warning, and iPadOS ignores the placement anyway.
-- **Unstable entry.** `createNativeBottomTabNavigator` is exported only from `/unstable` in 7.x, so its API can change in a minor release. Pin the version.
+- **Unstable entry.** `createNativeBottomTabNavigator` is exported only from the `/unstable` entry point of `@react-navigation/bottom-tabs` 7.x, so its API can change in a minor release. Pin the exact version, with no `^` or `~`. The package itself and the react-native-screens props it drives are stable; only the `/unstable` entry point can change. Expo Router `NativeTabs`, stable at SDK 58, is the stable route.
 
 ## @expo/ui
 ### iOS (SwiftUI)
