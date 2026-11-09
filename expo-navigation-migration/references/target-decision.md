@@ -48,7 +48,7 @@ Expo's own docs send routed full-screen tabs to `expo-router/native-tabs` rather
 | Several windows or scenes, or a custom entry per window | Multi-window was never run in the prototype. Expo's docs do not cover two Router trees in one runtime, beyond noting that the module-level `router` cannot tell roots apart. Prove it before choosing Router. |
 | iOS-only app whose shell is already @expo/ui and which uses no deep links | Staying on the shell is defensible. State the costs: no back interception, no full-screen cover, no URLs, and no Android path. This is the hop-only outcome below. |
 | Android is a target | Do not build Android navigation from Compose pieces. Design large-title and form-sheet screens for Material instead of mirroring iOS. |
-| Plain React Navigation chosen | Stable 7.x has no SDK 58 pin: `expo/bundledNativeModules.json` lists no `@react-navigation/*` package, and no page states SDK 58 compatibility. None of the patterns here was run on plain React Navigation. Add a verification step. |
+| Plain React Navigation chosen | Stable 7.x has no SDK 58 pin: `expo/bundledNativeModules.json` lists no `@react-navigation/*` package, and no page states SDK 58 compatibility. None of the patterns here was run on plain React Navigation except the sidebar, verified inside an Expo app (see [React Navigation without Expo Router](patterns/sidebar.md#react-navigation-without-expo-router)). Add a verification step. |
 | Foldable or dual-screen target | [patterns/dual-screen.md](patterns/dual-screen.md). Router has the tested two-pane path; @expo/ui has no two-pane screen in the prototype. |
 
 ## Outcomes
