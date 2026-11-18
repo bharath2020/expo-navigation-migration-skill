@@ -56,6 +56,9 @@ The layout maps the config to native triggers. The badge is live state. `NativeT
 From the prototype: `src/app/(tabs)/_layout.tsx`
 
 ```tsx
+import { NativeTabs } from 'expo-router/native-tabs';
+// ...
+
 export default function TabsLayout() {
   const navbarItems = useNavbarItems();
   const bottomToolbar = useBottomToolbar();
@@ -164,6 +167,9 @@ A SwiftUI `TabView` inside one `Host`. Selection is React state, and each tab's 
 From the prototype: `src/expo-ui/shell.ios.tsx`
 
 ```tsx
+import { SectionedTabView } from '../../modules/tab-sections';
+// ...
+
 const [tab, setTab] = useState<ShellTab>('stack');
 // ...
 const favoritesBadge = favorites.length ? String(favorites.length) : undefined;
@@ -225,6 +231,17 @@ A Material 3 `NavigationBar` at the bottom of the shell's `Column`, with a `Badg
 From the prototype: `src/expo-ui/shell.android.tsx`
 
 ```tsx
+import {
+  Badge,
+  BadgedBox,
+  Image,
+  NavigationBar,
+  NavigationBarItem,
+  Text,
+} from '@expo/ui/jetpack-compose';
+import { size, testID as testTag } from '@expo/ui/jetpack-compose/modifiers';
+// ...
+
 <NavigationBar>
   // ...
   {shellTabs.map(({ value, title: label }) => (
